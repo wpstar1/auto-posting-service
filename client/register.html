@@ -15,7 +15,7 @@
                 </h2>
                 <p class="mt-2 text-center text-sm text-gray-600">
                     이미 계정이 있으신가요?
-                    <a href="/login.html" class="font-medium text-blue-600 hover:text-blue-500">
+                    <a href="login.html" class="font-medium text-blue-600 hover:text-blue-500">
                         로그인하기
                     </a>
                 </p>
@@ -60,7 +60,7 @@
             }
 
             try {
-                const response = await fetch('http://localhost:3000/api/auth/register', {
+                const response = await fetch('/api/auth/register', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -76,7 +76,7 @@
 
                 if (data.success) {
                     alert('회원가입이 완료되었습니다. 로그인해주세요.');
-                    window.location.href = '/login.html';
+                    window.location.href = 'login.html';
                 } else {
                     alert(data.message || data.error || '회원가입에 실패했습니다.');
                 }
