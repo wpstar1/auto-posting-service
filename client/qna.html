@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q&A - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex">
+            <!-- 사이드바 -->
+            <div class="w-64 bg-white shadow-lg h-screen">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/auto-post.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        자동 포스팅
+                    </a>
+                    <a href="/platforms.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        계정 관리
+                    </a>
+                    <div class="border-t border-gray-200 my-4"></div>
+                    <a href="/support.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        고객센터
+                    </a>
+                    <a href="/qna.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Q&A
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10">
+                <div class="max-w-4xl mx-auto">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-6">고객센터</h1>
+                    
+                    <!-- 자주 묻는 질문 섹션 -->
+                    <div class="bg-white shadow-lg rounded-lg mb-8">
+                        <div class="border-b border-gray-200 p-6">
+                            <h2 class="text-2xl font-bold text-gray-900">자주 묻는 질문</h2>
+                        </div>
+                        <div class="p-6" id="faqList">
+                            <p class="text-gray-500">자주 묻는 질문을 불러오는 중...</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Q&A 게시판 섹션 -->
+                    <div class="bg-white shadow-lg rounded-lg">
+                        <div class="border-b border-gray-200 p-6 flex justify-between items-center">
+                            <h2 class="text-2xl font-bold text-gray-900">질문 게시판</h2>
+                            <button id="newPostBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                새 질문 작성
+                            </button>
+                        </div>
+                        <div class="p-6 space-y-6" id="qnaList">
+                            <p class="text-gray-500">게시글을 불러오는 중...</p>
+                        </div>
+                        <div class="flex justify-center p-6">
+                            <nav class="flex items-center">
+                                <button id="prevPage" class="px-3 py-2 bg-gray-200 text-gray-600 rounded-l-md hover:bg-gray-300 transition-colors">&lt;</button>
+                                <div id="pagination" class="flex items-center"></div>
+                                <button id="nextPage" class="px-3 py-2 bg-gray-200 text-gray-600 rounded-r-md hover:bg-gray-300 transition-colors">&gt;</button>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 새 글 작성 모달 -->
+    <div id="newPostModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-medium">새 Q&A 작성</h3>
+                        <button onclick="hideNewPostForm()" class="text-gray-400 hover:text-gray-500">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <form id="newPostForm" class="space-y-4">
+                        <div>
+                            <label for="title" class="block text-sm font-medium text-gray-700">제목</label>
+                            <input type="text" id="title" name="title" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="editor" class="block text-sm font-medium text-gray-700">내용</label>
+                            <div id="editor" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></div>
+                        </div>
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="hideNewPostForm()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                취소
+                            </button>
+                            <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                작성하기
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script>
+        // 토큰 체크
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // Quill 에디터 초기화
+        const quill = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+        
+        // 현재 페이지 및 총 페이지 저장
+        let currentPage = 1;
+        let totalPages = 1;
+        
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQnA();
+            loadFaqs();
+            
+            // 새 질문 버튼
+            document.getElementById('newPostBtn').addEventListener('click', showNewPostForm);
+            
+            // 페이지네이션 이벤트
+            document.getElementById('prevPage').addEventListener('click', function() {
+                if (currentPage > 1) {
+                    loadQnA(currentPage - 1);
+                }
+            });
+            
+            document.getElementById('nextPage').addEventListener('click', function() {
+                if (currentPage < totalPages) {
+                    loadQnA(currentPage + 1);
+                }
+            });
+        });
+        
+        // 자주 묻는 질문 로드
+        async function loadFaqs() {
+            try {
+                const response = await fetch('/api/faqs', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('자주 묻는 질문을 불러오는데 실패했습니다.');
+                }
+                
+                const data = await response.json();
+                const container = document.getElementById('faqList');
+                
+                if (data.success && data.faqs.length > 0) {
+                    container.innerHTML = '';
+                    
+                    // 카테고리별로 그룹화
+                    const categories = {};
+                    data.faqs.forEach(faq => {
+                        if (!categories[faq.category]) {
+                            categories[faq.category] = [];
+                        }
+                        categories[faq.category].push(faq);
+                    });
+                    
+                    // 카테고리별로 표시
+                    Object.keys(categories).forEach(category => {
+                        const categoryDiv = document.createElement('div');
+                        categoryDiv.className = 'mb-6';
+                        categoryDiv.innerHTML = `
+                            <h3 class="text-lg font-medium text-gray-900 mb-3">${category}</h3>
+                            <div class="space-y-4 faq-category">
+                                ${categories[category].map(faq => `
+                                    <div class="border border-gray-200 rounded-md">
+                                        <button class="faq-question w-full flex justify-between items-center p-3 focus:outline-none">
+                                            <span class="text-gray-800 font-medium text-left">${faq.question}</span>
+                                            <svg class="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        <div class="faq-answer hidden p-3 bg-gray-50 border-t border-gray-200">
+                                            <p class="text-gray-700">${faq.answer}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                        container.appendChild(categoryDiv);
+                    });
+                    
+                    // FAQ 질문 클릭 이벤트 추가
+                    document.querySelectorAll('.faq-question').forEach(question => {
+                        question.addEventListener('click', function() {
+                            const answer = this.nextElementSibling;
+                            const isHidden = answer.classList.contains('hidden');
+                            
+                            // 다른 모든 답변 닫기
+                            document.querySelectorAll('.faq-answer').forEach(a => {
+                                a.classList.add('hidden');
+                            });
+                            
+                            // 현재 답변 토글
+                            if (isHidden) {
+                                answer.classList.remove('hidden');
+                            }
+                        });
+                    });
+                } else {
+                    container.innerHTML = '<p class="text-gray-500">등록된 자주 묻는 질문이 없습니다.</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('faqList').innerHTML = '<p class="text-red-500">자주 묻는 질문을 불러오는 중 오류가 발생했습니다.</p>';
+            }
+        }
+
+        // 새 글 작성 모달 표시
+        function showNewPostForm() {
+            document.getElementById('newPostModal').classList.remove('hidden');
+        }
+
+        // 새 글 작성 모달 숨기기
+        function hideNewPostForm() {
+            document.getElementById('newPostModal').classList.add('hidden');
+            document.getElementById('title').value = '';
+            quill.setContents([]);
+        }
+
+        // Q&A 목록 로드
+        async function loadQnA(page = 1) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/api/qna/posts?page=${page}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('게시글 목록을 불러오는데 실패했습니다.');
+                }
+
+                const data = await response.json();
+                const container = document.getElementById('qnaList');
+                container.innerHTML = '';
+                
+                data.posts.forEach(post => {
+                    const div = document.createElement('div');
+                    div.className = 'border-b border-gray-200 pb-6';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-lg font-medium">
+                                <a href="#" onclick="viewPost('${post._id}')" class="text-blue-600 hover:text-blue-800">${post.title}</a>
+                            </h3>
+                            <span class="text-sm text-gray-500">${new Date(post.createdAt).toLocaleDateString()}</span>
+                        </div>
+                        <div class="mt-2">
+                            <p class="text-gray-600">${post.content.substring(0, 200)}${post.content.length > 200 ? '...' : ''}</p>
+                        </div>
+                        <div class="mt-3 flex items-center text-sm text-gray-500">
+                            <span>작성자: ${post.author}</span>
+                            <span class="mx-2">•</span>
+                            <span>댓글: ${post.comments ? post.comments.length : 0}</span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+
+                updatePagination(data.currentPage, data.totalPages);
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        }
+
+        // 페이지네이션 업데이트
+        function updatePagination(currentPage, totalPages) {
+            const container = document.getElementById('pagination');
+            container.innerHTML = '';
+            
+            for (let i = 1; i <= totalPages; i++) {
+                const button = document.createElement('button');
+                button.className = `px-3 py-1 mx-1 rounded ${i === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`;
+                button.textContent = i;
+                button.onclick = () => loadQnA(i);
+                container.appendChild(button);
+            }
+        }
+
+        // 게시글 보기
+        function viewPost(id) {
+            // 게시글 상세 보기 구현
+            console.log('View post:', id);
+        }
+
+        // 새 글 작성
+        document.getElementById('newPostForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const content = quill.root.innerHTML;
+            const token = localStorage.getItem('token');
+
+            try {
+                const response = await fetch('/api/qna/posts', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title,
+                        content
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '게시글 작성에 실패했습니다.');
+                }
+
+                hideNewPostForm();
+                loadQnA();
+                alert('게시글이 작성되었습니다.');
+            } catch (error) {
+                console.error('Error:', error);
+                alert(error.message);
+            }
+        });
+
+        // 초기 로드
+        loadQnA();
+    </script>
+</body>
+</html>

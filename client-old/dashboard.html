@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대시보드 - 자동 포스팅 서비스</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">🚀 사용자 대시보드</h1>
+        <div>
+             <span id="user-email" class="text-sm mr-4"></span> <!-- Display user email -->
+             <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">로그아웃</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold mb-4">👋 환영합니다, <span id="welcome-email"></span>!</h2>
+            <p class="text-gray-700">
+                자동 포스팅 서비스 대시보드입니다. 아래에서 워드프레스 설정을 관리하세요.
+            </p>
+        </div>
+
+        <!-- Quick Post Section -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold mb-4">🚀 빠른 포스팅</h2>
+            <form id="quick-post-form">
+                <div class="space-y-5">
+                    <!-- Keywords Section -->
+                    <div>
+                        <label for="keyword" class="block text-sm font-medium text-gray-700 mb-1">포스팅 키워드 <span class="text-xs text-gray-500">(쉼표(,)로 여러 개 입력 가능)</span></label>
+                        <input id="keyword" name="keyword" placeholder="예: 강아지 종류, 맛집 추천, 여행 팁" class="border border-gray-300 p-3 w-full rounded-md focus:ring-blue-500 focus:border-blue-500 transition">
+                    </div>
+
+                    <!-- Content Options Section -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <h3 class="text-md font-semibold text-gray-800 mb-3">글 내용 설정</h3>
+
+                        <!-- Content Writing Style -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">콘텐츠 작성 방식</label>
+                            <div class="flex flex-wrap gap-4">
+                                <div class="flex items-center">
+                                    <input id="contentStrategyAiOnly" name="contentStrategy" type="radio" value="ai_only" checked class="focus:ring-purple-500 h-4 w-4 text-purple-600 border-gray-300">
+                                    <label for="contentStrategyAiOnly" class="ml-2 block text-sm text-gray-900">AI 자동 작성</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="contentStrategyMix" name="contentStrategy" type="radio" value="mix" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+                                    <label for="contentStrategyMix" class="ml-2 block text-sm text-gray-900">입력 내용 + AI</label>
+                                </div>
+                                <div class="flex items-center">
+                                    <input id="contentStrategyUser" name="contentStrategy" type="radio" value="user_only" class="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300">
+                                    <label for="contentStrategyUser" class="ml-2 block text-sm text-gray-900">직접 입력만</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Content Tone -->
+                        <div class="mb-4">
+                            <label for="contentTone" class="block text-sm font-medium text-gray-700 mb-1">글 분위기</label>
+                            <select id="contentTone" name="contentTone" class="border border-gray-300 p-2 w-full sm:w-auto rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="default" selected>기본 (친근한 블로그체)</option>
+                                <option value="professional">전문적</option>
+                                <option value="friendly">매우 친근함</option>
+                                <option value="humorous">유머러스</option>
+                                <option value="informative">정보 전달</option>
+                                <option value="storytelling">스토리텔링</option>
+                            </select>
+                        </div>
+
+                        <!-- User Content Input -->
+                        <div>
+                            <label for="content" class="block text-sm font-medium text-gray-700 mb-1">직접 작성 내용 <span class="text-xs text-gray-500">(선택 사항)</span></label>
+                            <textarea id="content" name="content" placeholder="'직접 입력 내용만 사용' 또는 'AI 작성 추가' 선택 시 여기에 내용을 입력하세요." rows="3" class="border border-gray-300 p-3 w-full rounded-md focus:ring-blue-500 focus:border-blue-500"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Image Upload Section -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <h3 class="text-md font-semibold text-gray-800 mb-3">이미지 업로드 <span class="text-xs text-gray-500">(선택 사항)</span></h3>
+                        <p class="text-xs text-gray-500 mb-2">업로드한 이미지는 포스팅에 함께 사용됩니다.</p>
+                        
+                        <div class="mb-4">
+                            <label for="imageUpload" class="cursor-pointer bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium py-2 px-4 border border-gray-300 rounded-md shadow-sm inline-flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                </svg>
+                                이미지 파일 선택
+                                <input id="imageUpload" name="imageUpload" type="file" accept="image/*" class="sr-only" onchange="handleImageUpload(event)" multiple>
+                            </label>
+                        </div>
+                        
+                        <div id="imagePreviewArea" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 mb-2"></div>
+                        <button id="clearImagePreview" type="button" class="hidden text-xs text-red-500 hover:text-red-700 mb-2" onclick="clearImagePreviews()">첨부된 이미지 모두 지우기</button>
+                    </div>
+
+                    <!-- Hidden input for image strategy to ensure form works correctly -->
+                    <input type="hidden" id="imgStrategyAi" name="imageStrategy" value="ai">
+
+                    <!-- 반복 포스팅 섹션 -->
+                    <div class="border-t border-gray-200 pt-4">
+                        <h3 class="text-md font-semibold text-gray-800 mb-3">포스팅 반복 설정</h3>
+                        
+                        <div class="mb-4">
+                            <label for="scheduleInterval" class="block text-sm font-medium text-gray-700 mb-1">반복 주기</label>
+                            <select id="scheduleInterval" name="scheduleInterval" class="border border-gray-300 p-2 w-full rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm">
+                                <option value="now" selected>지금 한 번만 포스팅</option>
+                                <option value="3hourly">3시간에 1번</option>
+                                <option value="5hourly">5시간에 1번</option>
+                                <option value="10hourly">10시간에 1번</option>
+                                <option value="daily">하루에 한 번</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex items-center mb-2">
+                            <input type="checkbox" id="enableAllSchedules" name="enableAllSchedules" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                            <label for="enableAllSchedules" class="ml-2 block text-sm text-gray-900">모든 스케줄링 반복</label>
+                        </div>
+                        <p class="text-xs text-gray-500">반복 설정 시, 현재 입력된 키워드와 설정으로 주기마다 자동으로 포스팅합니다.</p>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="pt-4">
+                        <button type="button" id="post-now-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition flex items-center justify-center">
+                            <span id="post-button-text">✨ 지금 포스팅하기</span>
+                            <span id="post-loading-spinner" class="hidden ml-2">
+                                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            </span>
+                        </button>
+                        
+                        <div class="flex justify-center mt-3">
+                            <button type="button" id="save-draft-button" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm">
+                                임시저장
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Post Result Area -->
+                    <div id="post-result" class="mt-2 p-3 rounded text-sm text-gray-600 hidden">
+                        <p id="post-result-message" class="text-center mb-3 font-medium"></p>
+                        <div id="post-result-details" class="bg-gray-50 p-3 rounded-md"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- WordPress Settings Section -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold mb-4">워드프레스 설정</h2>
+            <form id="wp-settings-form">
+                <div class="mb-4">
+                    <label for="wpUrl" class="block text-gray-700 text-sm font-bold mb-2">워드프레스 URL</label>
+                    <input type="url" id="wpUrl" name="wpUrl"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           placeholder="https://your-wordpress-site.com">
+                </div>
+                 <div class="mb-4">
+                    <label for="wpUsername" class="block text-gray-700 text-sm font-bold mb-2">워드프레스 사용자명</label>
+                    <input type="text" id="wpUsername" name="wpUsername"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                           placeholder="WordPress Username">
+                </div>
+                <div class="mb-6">
+                    <label for="wpPassword" class="block text-gray-700 text-sm font-bold mb-2">워드프레스 앱 비밀번호</label>
+                    <input type="password" id="wpPassword" name="wpPassword"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline"
+                           placeholder="앱 비밀번호 입력 (저장 시 암호화됩니다)">
+                     <p class="text-xs text-gray-500">워드프레스 관리자 > 사용자 > 프로필 > 애플리케이션 비밀번호에서 생성하세요.</p>
+                </div>
+                <div class="flex items-center justify-end mb-4">
+                    <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        설정 저장
+                    </button>
+                </div>
+                <div id="settings-message" class="text-center text-sm mt-4"></div> <!-- Message area -->
+            </form>
+        </div>
+
+        <!-- Saved Posts Section -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold mb-4">저장된 글 및 예약 관리</h2>
+            
+            <div class="overflow-x-auto">
+                <table id="saved-posts-table" class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목/키워드</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이미지</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">예약 시간</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody id="saved-posts-list" class="bg-white divide-y divide-gray-200">
+                        <!-- Saved post items will be loaded here -->
+                        <tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">저장된 글이 없습니다</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Post Scheduling Modal (Initially Hidden) -->
+        <div id="schedule-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 m-4 max-w-xl max-h-full overflow-auto w-full">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-medium text-gray-900">글 예약 설정</h3>
+                    <button id="close-schedule-modal" class="text-gray-400 hover:text-gray-500">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form id="schedule-post-form">
+                    <input type="hidden" id="schedule-post-id">
+                    <div class="mb-4">
+                        <label for="schedule-date" class="block text-sm font-medium text-gray-700 mb-2">날짜</label>
+                        <input type="date" id="schedule-date" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-6">
+                        <label for="schedule-time" class="block text-sm font-medium text-gray-700 mb-2">시간</label>
+                        <input type="time" id="schedule-time" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" id="cancel-schedule-button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            취소
+                        </button>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            예약 설정
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('authToken');
+            const userEmailSpan = document.getElementById('user-email');
+            const welcomeEmailSpan = document.getElementById('welcome-email');
+            const logoutButton = document.getElementById('logout-button');
+            const wpSettingsForm = document.getElementById('wp-settings-form');
+            const settingsMessageDiv = document.getElementById('settings-message');
+            
+            // 빠른 포스팅 관련 요소
+            const quickPostForm = document.getElementById('quick-post-form');
+            const postNowButton = document.getElementById('post-now-button');
+            const postButtonText = document.getElementById('post-button-text');
+            const postLoadingSpinner = document.getElementById('post-loading-spinner');
+            const postResult = document.getElementById('post-result');
+            const postResultMessage = document.getElementById('post-result-message');
+            const postResultDetails = document.getElementById('post-result-details');
+
+            // --- Authentication Check --- 
+            if (!token) {
+                console.log('No token found, redirecting to login.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            // --- 빠른 포스팅 기능 ---
+            postNowButton.addEventListener('click', async () => {
+                // UI 업데이트 - 로딩 시작
+                postNowButton.disabled = true;
+                postButtonText.classList.add('hidden');
+                postLoadingSpinner.classList.remove('hidden');
+                postResult.classList.add('hidden');
+                
+                try {
+                    // form 요소들이 존재하는지 먼저 확인
+                    const keywordElement = document.getElementById('keyword');
+                    const contentElement = document.getElementById('content');
+                    const contentToneElement = document.getElementById('contentTone');
+                    const contentStrategyElement = document.querySelector('input[name="contentStrategy"]:checked');
+                    const imageStrategyElement = document.querySelector('input[name="imageStrategy"]:checked');
+                    
+                    // 필요한 요소가 없는 경우 오류 처리
+                    if (!keywordElement) throw new Error('키워드 입력 필드를 찾을 수 없습니다.');
+                    if (!contentElement) throw new Error('내용 입력 필드를 찾을 수 없습니다.');
+                    if (!contentToneElement) throw new Error('글 분위기 선택 필드를 찾을 수 없습니다.');
+                    if (!contentStrategyElement) throw new Error('콘텐츠 작성 방식을 선택해주세요.');
+                    if (!imageStrategyElement) {
+                        // 이미지 전략이 선택되지 않았을 경우 기본값 사용
+                        console.warn('이미지 전략을 찾을 수 없습니다. 기본값(AI)을 사용합니다.');
+                    }
+                    
+                    // 폼 데이터 수집
+                    const formData = {
+                        keyword: keywordElement.value,
+                        content: contentElement.value,
+                        contentStrategy: contentStrategyElement.value,
+                        contentTone: contentToneElement.value,
+                        imageStrategy: imageStrategyElement ? imageStrategyElement.value : 'ai', // 기본값 제공
+                        targetPlatform: 'wordpress',
+                        scheduleInterval: 'now'
+                    };
+                    
+                    console.log('포스팅 데이터:', formData);
+                    
+                    // 유효성 검사
+                    if (!formData.keyword) {
+                        throw new Error('키워드를 입력해주세요.');
+                    }
+                    
+                    // API 요청 전송
+                    const response = await fetch('/api/post', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    // 응답이 없거나 형식이 올바르지 않은 경우
+                    if (!response) {
+                        throw new Error('서버 응답이 없습니다.');
+                    }
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ error: '서버 오류' }));
+                        throw new Error(errorData.error || `서버 오류: ${response.status}`);
+                    }
+                    
+                    // 결과 처리
+                    const data = await response.json();
+                    if (data.success) {
+                        postResultMessage.textContent = '포스팅이 성공적으로 완료되었습니다!';
+                        postResultMessage.className = 'text-center mb-3 font-medium text-green-600';
+                        
+                        // 결과 상세 정보 표시
+                        let detailsHTML = `
+                            <p class="mb-2"><strong>제목:</strong> ${data.title || '제목 정보 없음'}</p>
+                            <p class="mb-2"><strong>URL:</strong> <a href="${data.finalPostUrl}" target="_blank" class="text-blue-600 hover:underline">${data.finalPostUrl}</a></p>
+                            <p><strong>포스트 ID:</strong> ${data.postId || '정보 없음'}</p>
+                        `;
+                        postResultDetails.innerHTML = detailsHTML;
+                        postResult.classList.remove('hidden');
+                    } else {
+                        throw new Error(data.error || '포스팅 중 오류가 발생했습니다.');
+                    }
+                } catch (error) {
+                    console.error('포스팅 오류:', error);
+                    postResultMessage.textContent = error.message;
+                    postResultMessage.className = 'text-center mb-3 font-medium text-red-600';
+                    postResult.classList.remove('hidden');
+                    postResultDetails.innerHTML = '';
+                } finally {
+                    // UI 업데이트 - 로딩 종료
+                    postNowButton.disabled = false;
+                    postButtonText.classList.remove('hidden');
+                    postLoadingSpinner.classList.add('hidden');
+                }
+            });
+
+            // --- 임시 저장 기능 ---
+            const saveDraftButton = document.getElementById('save-draft-button');
+            saveDraftButton.addEventListener('click', async () => {
+                // UI 업데이트 - 버튼 비활성화
+                saveDraftButton.disabled = true;
+                saveDraftButton.textContent = '저장 중...';
+                
+                try {
+                    // form 요소들이 존재하는지 먼저 확인
+                    const keywordElement = document.getElementById('keyword');
+                    const contentElement = document.getElementById('content');
+                    const contentToneElement = document.getElementById('contentTone');
+                    const contentStrategyElement = document.querySelector('input[name="contentStrategy"]:checked');
+                    const imageStrategyElement = document.querySelector('input[name="imageStrategy"]:checked');
+                    
+                    // 필요한 요소가 없는 경우 오류 처리
+                    if (!keywordElement) throw new Error('키워드 입력 필드를 찾을 수 없습니다.');
+                    if (!contentElement) throw new Error('내용 입력 필드를 찾을 수 없습니다.');
+                    if (!contentToneElement) throw new Error('글 분위기 선택 필드를 찾을 수 없습니다.');
+                    if (!contentStrategyElement) throw new Error('콘텐츠 작성 방식을 선택해주세요.');
+                    if (!imageStrategyElement) {
+                        console.warn('이미지 전략을 찾을 수 없습니다. 기본값(AI)을 사용합니다.');
+                    }
+                    
+                    // FormData 생성
+                    const formData = new FormData();
+                    
+                    formData.append('keyword', keywordElement.value);
+                    formData.append('content', contentElement.value);
+                    formData.append('contentStrategy', contentStrategyElement.value);
+                    formData.append('contentTone', contentToneElement.value);
+                    formData.append('imageStrategy', imageStrategyElement ? imageStrategyElement.value : 'ai');
+                    formData.append('targetPlatform', 'wordpress');
+                    formData.append('isDraft', 'true');
+                    
+                    // 이미지 파일 추가
+                    if (window.uploadedImages && window.uploadedImages.length > 0) {
+                        window.uploadedImages.forEach((fileObj, index) => {
+                            if (fileObj && fileObj.file) {
+                                formData.append('images', fileObj.file);
+                            }
+                        });
+                    }
+                    
+                    // 유효성 검사
+                    if (!keywordElement.value) {
+                        throw new Error('키워드를 입력해주세요.');
+                    }
+                    
+                    console.log('임시저장 데이터 준비 완료');
+                    
+                    // API 요청 전송 (FormData를 사용하여 파일 업로드)
+                    const response = await fetch('/api/post/save', {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: formData
+                    });
+                    
+                    // 응답 처리
+                    if (!response.ok) {
+                        throw new Error(`서버 오류: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        alert('글이 임시저장되었습니다.');
+                        // 폼 초기화
+                        keywordElement.value = '';
+                        contentElement.value = '';
+                        clearImagePreviews();
+                        loadSavedPosts(); // 저장된 글 목록 새로고침
+                    } else {
+                        throw new Error(data.error || '저장 중 오류가 발생했습니다.');
+                    }
+                } catch (error) {
+                    console.error('임시저장 오류:', error);
+                    alert(`임시저장 실패: ${error.message}`);
+                } finally {
+                    // UI 상태 복원
+                    saveDraftButton.disabled = false;
+                    saveDraftButton.textContent = '임시저장';
+                }
+            });
+            
+            // 이미지 업로드 처리
+            window.uploadedImages = [];
+            
+            function handleImageUpload(event) {
+                const files = event.target.files;
+                const previewArea = document.getElementById('imagePreviewArea');
+                const clearButton = document.getElementById('clearImagePreview');
+                
+                if (files.length > 0) {
+                    clearButton.classList.remove('hidden');
+                    
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            const imageId = `img-${Date.now()}-${i}`;
+                            
+                            // 이미지 객체 저장
+                            window.uploadedImages.push({
+                                id: imageId,
+                                file: file,
+                                preview: e.target.result
+                            });
+                            
+                            // 미리보기 생성
+                            const previewDiv = document.createElement('div');
+                            previewDiv.className = 'relative rounded overflow-hidden border border-gray-200';
+                            previewDiv.style.paddingBottom = '100%'; // 정사각형 비율 유지
+                            previewDiv.dataset.imageId = imageId;
+                            
+                            previewDiv.innerHTML = `
+                                <img src="${e.target.result}" class="absolute inset-0 w-full h-full object-cover" alt="Image Preview">
+                                <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs" 
+                                    onclick="removeImage('${imageId}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            `;
+                            
+                            previewArea.appendChild(previewDiv);
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                }
+            }
+            
+            function removeImage(imageId) {
+                // 이미지 객체에서 제거
+                window.uploadedImages = window.uploadedImages.filter(img => img.id !== imageId);
+                
+                // 화면에서 제거
+                const previewDiv = document.querySelector(`[data-image-id="${imageId}"]`);
+                if (previewDiv) {
+                    previewDiv.remove();
+                }
+                
+                // 모든 이미지가 제거되었으면 버튼도 숨김
+                if (window.uploadedImages.length === 0) {
+                    document.getElementById('clearImagePreview').classList.add('hidden');
+                }
+            }
+            
+            function clearImagePreviews() {
+                const previewArea = document.getElementById('imagePreviewArea');
+                const clearButton = document.getElementById('clearImagePreview');
+                
+                previewArea.innerHTML = '';
+                window.uploadedImages = [];
+                clearButton.classList.add('hidden');
+                
+                // 파일 인풋 초기화
+                const fileInput = document.getElementById('imageUpload');
+                fileInput.value = '';
+            }
+            
+            // --- 저장된 글 관리 기능 ---
+            const savedPostsList = document.getElementById('saved-posts-list');
+            const scheduleModal = document.getElementById('schedule-modal');
+            const closeScheduleModalButton = document.getElementById('close-schedule-modal');
+            const schedulePostForm = document.getElementById('schedule-post-form');
+            const schedulePostIdInput = document.getElementById('schedule-post-id');
+            const cancelScheduleButton = document.getElementById('cancel-schedule-button');
+            
+            // 저장된 글 목록 로드
+            async function loadSavedPosts() {
+                try {
+                    const token = localStorage.getItem('authToken');
+                    if (!token) {
+                        throw new Error('로그인이 필요합니다');
+                    }
+                    
+                    savedPostsList.innerHTML = '<tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">글 로딩 중...</td></tr>';
+                    
+                    // 서버에서 저장된 글 목록을 가져오는 API 호출
+                    console.log('저장된 글 목록 로드 중...');
+                    const response = await fetch('/api/post/saved', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    // 응답 처리
+                    if (!response.ok) {
+                        throw new Error('저장된 글을 불러올 수 없습니다');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('저장된 글 데이터:', data);
+                    
+                    // 데이터 검증
+                    if (!data || !data.success) {
+                        throw new Error(data.message || '데이터 형식 오류');
+                    }
+                    
+                    // 글 목록이 비어있는 경우 처리
+                    const posts = data.posts || [];
+                    if (posts.length === 0) {
+                        savedPostsList.innerHTML = '<tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">저장된 글이 없습니다</td></tr>';
+                        return;
+                    }
+                    
+                    // 글 목록 표시
+                    savedPostsList.innerHTML = '';
+                    posts.forEach(post => {
+                        const row = document.createElement('tr');
+                        
+                        // 날짜 형식 설정
+                        const scheduledDate = post.scheduledAt ? new Date(post.scheduledAt) : null;
+                        const formattedDate = scheduledDate ? 
+                            scheduledDate.toLocaleString('ko-KR') : '-';
+                        
+                        // 이미지 섬네일 표시 (이미지가 없을 수 있음)
+                        let imagesHTML = '<span class="text-gray-400">없음</span>';
+                        if (post.images && post.images.length > 0) {
+                            imagesHTML = `<div class="flex space-x-1">
+                                ${post.images.slice(0, 3).map(img => 
+                                    `<img src="${img.url || ''}" class="w-8 h-8 object-cover rounded" alt="이미지">`
+                                ).join('')}
+                                ${post.images.length > 3 ? `<span class="flex items-center text-xs text-gray-500">+${post.images.length - 3}</span>` : ''}
+                            </div>`;
+                        }
+                        
+                        // 상태 표시
+                        let statusText = '저장됨';
+                        let statusClass = 'bg-gray-100 text-gray-800';
+                        
+                        if (post.published) {
+                            statusText = '게시됨';
+                            statusClass = 'bg-green-100 text-green-800';
+                        } else if (post.scheduledAt) {
+                            statusText = '예약됨';
+                            statusClass = 'bg-blue-100 text-blue-800';
+                        }
+                        
+                        row.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${post.keyword || '제목 없음'}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${imagesHTML}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${formattedDate}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass}">
+                                    ${statusText}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                                <button data-id="${post._id}" class="edit-post-button text-indigo-600 hover:text-indigo-900">수정</button>
+                                ${post.published ? '' : `<button data-id="${post._id}" class="schedule-post-button text-blue-600 hover:text-blue-900">예약</button>`}
+                                ${post.published ? '' : `<button data-id="${post._id}" class="publish-post-button text-green-600 hover:text-green-900">게시</button>`}
+                                <button data-id="${post._id}" class="delete-post-button text-red-600 hover:text-red-900">삭제</button>
+                            </td>
+                        `;
+                        
+                        savedPostsList.appendChild(row);
+                    });
+                    
+                    // 행 버튼에 이벤트 리스너 추가
+                    document.querySelectorAll('.edit-post-button').forEach(button => {
+                        button.addEventListener('click', () => editPost(button.dataset.id));
+                    });
+                    
+                    document.querySelectorAll('.schedule-post-button').forEach(button => {
+                        button.addEventListener('click', () => openScheduleModal(button.dataset.id));
+                    });
+                    
+                    document.querySelectorAll('.publish-post-button').forEach(button => {
+                        button.addEventListener('click', () => publishPost(button.dataset.id));
+                    });
+                    
+                    document.querySelectorAll('.delete-post-button').forEach(button => {
+                        button.addEventListener('click', () => deletePost(button.dataset.id));
+                    });
+                } catch (error) {
+                    console.error('저장된 글 로드 오류:', error);
+                    if (savedPostsList) {
+                        savedPostsList.innerHTML = `<tr><td colspan="5" class="px-6 py-4 whitespace-nowrap text-sm text-red-500 text-center">오류: ${error.message}</td></tr>`;
+                    }
+                }
+            }
+            
+            // 저장된 글 수정
+            async function editPost(postId) {
+                try {
+                    const response = await fetchAPI(`/api/post/${postId}`);
+                    
+                    if (!response || !response.ok) {
+                        throw new Error('글 정보를 불러올 수 없습니다');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success && data.post) {
+                        const post = data.post;
+                        
+                        // 폼에 데이터 채우기
+                        document.getElementById('keyword').value = post.keyword || '';
+                        document.getElementById('content').value = post.content || '';
+                        
+                        // Content strategy 선택
+                        const contentStrategyValue = post.contentStrategy || 'ai_only';
+                        document.querySelector(`input[name="contentStrategy"][value="${contentStrategyValue}"]`).checked = true;
+                        
+                        // Content tone 선택
+                        document.getElementById('contentTone').value = post.contentTone || 'default';
+                        
+                        // 이미지 미리보기 표시
+                        clearImagePreviews(); // 기존 이미지 초기화
+                        if (post.images && post.images.length > 0) {
+                            const previewArea = document.getElementById('imagePreviewArea');
+                            const clearButton = document.getElementById('clearImagePreview');
+                            clearButton.classList.remove('hidden');
+                            
+                            post.images.forEach((image, index) => {
+                                const imageId = `server-img-${image._id || index}`;
+                                
+                                // 이미지 객체 저장 (서버에서 가져온 이미지)
+                                window.uploadedImages.push({
+                                    id: imageId,
+                                    serverId: image._id,
+                                    preview: image.url,
+                                    isServer: true
+                                });
+                                
+                                // 미리보기 생성
+                                const previewDiv = document.createElement('div');
+                                previewDiv.className = 'relative rounded overflow-hidden border border-gray-200';
+                                previewDiv.style.paddingBottom = '100%'; // 정사각형 비율 유지
+                                previewDiv.dataset.imageId = imageId;
+                                
+                                previewDiv.innerHTML = `
+                                    <img src="${image.url}" class="absolute inset-0 w-full h-full object-cover" alt="Image Preview">
+                                    <button type="button" class="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 w-6 h-6 flex items-center justify-center text-xs" 
+                                        onclick="removeImage('${imageId}')">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                `;
+                                
+                                previewArea.appendChild(previewDiv);
+                            });
+                        }
+                        
+                        // 폼에 포스트 ID 추가 (히든 필드로 추가)
+                        if (!document.getElementById('edit-post-id')) {
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.id = 'edit-post-id';
+                            hiddenInput.value = post._id;
+                            document.getElementById('quick-post-form').appendChild(hiddenInput);
+                        } else {
+                            document.getElementById('edit-post-id').value = post._id;
+                        }
+                        
+                        // 저장 버튼 텍스트 변경
+                        saveDraftButton.textContent = '수정 저장';
+                        
+                        // 스크롤을 폼 위치로
+                        document.getElementById('quick-post-form').scrollIntoView({ behavior: 'smooth' });
+                    } else {
+                        throw new Error(data.message || '데이터 형식 오류');
+                    }
+                } catch (error) {
+                    console.error('Error loading post for edit:', error);
+                    alert(`글 수정 준비 실패: ${error.message}`);
+                }
+            }
+            
+            // 글 예약 모달 열기
+            function openScheduleModal(postId) {
+                schedulePostIdInput.value = postId;
+                
+                // 기본값으로 내일 날짜 설정
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                
+                const dateStr = tomorrow.toISOString().split('T')[0];
+                const timeStr = '09:00';
+                
+                document.getElementById('schedule-date').value = dateStr;
+                document.getElementById('schedule-time').value = timeStr;
+                
+                scheduleModal.classList.remove('hidden');
+            }
+            
+            // 글 예약 모달 닫기
+            function closeScheduleModal() {
+                scheduleModal.classList.add('hidden');
+                schedulePostForm.reset();
+            }
+            
+            // 글 예약 설정
+            async function schedulePost(e) {
+                e.preventDefault();
+                
+                const postId = schedulePostIdInput.value;
+                const scheduleDate = document.getElementById('schedule-date').value;
+                const scheduleTime = document.getElementById('schedule-time').value;
+                
+                if (!scheduleDate || !scheduleTime) {
+                    alert('날짜와 시간을 모두 입력해주세요.');
+                    return;
+                }
+                
+                // ISO 형식의 날짜+시간 문자열 생성
+                const scheduledAt = `${scheduleDate}T${scheduleTime}:00`;
+                
+                try {
+                    const response = await fetchAPI(`/api/post/${postId}/schedule`, {
+                        method: 'PUT',
+                        body: JSON.stringify({ scheduledAt })
+                    });
+                    
+                    if (!response || !response.ok) {
+                        throw new Error('예약 설정 중 오류가 발생했습니다');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('글이 성공적으로 예약되었습니다.');
+                        closeScheduleModal();
+                        loadSavedPosts(); // 목록 새로고침
+                    } else {
+                        throw new Error(data.message || '알 수 없는 오류');
+                    }
+                } catch (error) {
+                    console.error('Error scheduling post:', error);
+                    alert(`예약 설정 실패: ${error.message}`);
+                }
+            }
+            
+            // 저장된 글 게시하기
+            async function publishPost(postId) {
+                if (!confirm('이 글을 지금 게시하시겠습니까?')) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetchAPI(`/api/post/${postId}/publish`, {
+                        method: 'PUT'
+                    });
+                    
+                    if (!response || !response.ok) {
+                        throw new Error('게시 중 오류가 발생했습니다');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('글이 성공적으로 게시되었습니다.');
+                        loadSavedPosts(); // 목록 새로고침
+                    } else {
+                        throw new Error(data.message || '알 수 없는 오류');
+                    }
+                } catch (error) {
+                    console.error('Error publishing post:', error);
+                    alert(`게시 실패: ${error.message}`);
+                }
+            }
+            
+            // 저장된 글 삭제하기
+            async function deletePost(postId) {
+                if (!confirm('이 글을 정말 삭제하시겠습니까?')) {
+                    return;
+                }
+                
+                try {
+                    const response = await fetchAPI(`/api/post/${postId}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (!response || !response.ok) {
+                        throw new Error('삭제 중 오류가 발생했습니다');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('글이 삭제되었습니다.');
+                        loadSavedPosts(); // 목록 새로고침
+                    } else {
+                        throw new Error(data.message || '알 수 없는 오류');
+                    }
+                } catch (error) {
+                    console.error('Error deleting post:', error);
+                    alert(`삭제 실패: ${error.message}`);
+                }
+            }
+
+            // --- Helper: API Fetch Function with Auth Header ---
+            async function fetchAPI(url, options = {}) {
+                // URL이 /로 시작하는지 확인하고 필요한 경우 수정
+                if (!url.startsWith('/') && !url.startsWith('http')) {
+                    url = '/' + url;
+                }
+                
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    ...(options.headers || {}),
+                };
+                
+                try {
+                    console.log(`API 요청: ${url}, 메소드: ${options.method || 'GET'}`);
+                    const response = await fetch(url, { ...options, headers });
+                    console.log(`API 응답 상태: ${response.status}, 컨텐츠 타입: ${response.headers.get('content-type')}`);
+                    
+                    if (response.status === 401) {
+                        // Unauthorized (e.g., token expired)
+                        localStorage.removeItem('authToken');
+                        alert('인증이 만료되었습니다. 다시 로그인해주세요.');
+                        window.location.href = '/login.html';
+                        return null; // Indicate failure
+                    }
+                    return response;
+                } catch (error) {
+                    console.error('API Fetch Error:', error);
+                    // Handle network errors
+                    alert('네트워크 오류 또는 서버 연결 실패');
+                    return null; // Indicate failure
+                }
+            }
+
+            // --- Load User Settings --- 
+            async function loadUserSettings() {
+                console.log('사용자 설정 로드 중...');
+                try {
+                    const token = localStorage.getItem('authToken');
+                    if (!token) {
+                        throw new Error('로그인이 필요합니다');
+                    }
+                    
+                    const response = await fetch('/api/user/settings', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('설정을 로드할 수 없습니다');
+                    }
+                    
+                    const data = await response.json();
+                    console.log('설정 데이터:', data);
+                    
+                    if (data.success && data.settings) {
+                        const settings = data.settings;
+                        
+                        // 이메일 표시
+                        if (userEmailSpan) userEmailSpan.textContent = settings.email || '';
+                        if (welcomeEmailSpan) welcomeEmailSpan.textContent = settings.email || '';
+                        
+                        // 워드프레스 설정 폼 채우기
+                        const wpUrlInput = document.getElementById('wpUrl');
+                        const wpUsernameInput = document.getElementById('wpUsername');
+                        const wpPasswordInput = document.getElementById('wpPassword');
+                        
+                        if (wpUrlInput) wpUrlInput.value = settings.wpUrl || '';
+                        if (wpUsernameInput) wpUsernameInput.value = settings.wpUsername || '';
+                        if (wpPasswordInput) {
+                            wpPasswordInput.value = '';
+                            wpPasswordInput.placeholder = '변경시에만 입력하세요';
+                        }
+                    } else {
+                        throw new Error(data.message || '설정 데이터 형식 오류');
+                    }
+                } catch (error) {
+                    console.error('설정 로드 오류:', error);
+                    if (settingsMessageDiv) {
+                        settingsMessageDiv.textContent = `설정 로딩 실패: ${error.message}`;
+                        settingsMessageDiv.className = 'text-center text-sm mt-4 text-red-500';
+                    }
+                }
+            }
+
+            // --- Save User Settings --- 
+            async function saveUserSettings(e) {
+                e.preventDefault();
+                console.log('저장 버튼 클릭됨');
+                settingsMessageDiv.textContent = '저장 중...';
+                settingsMessageDiv.className = 'text-center text-sm mt-4 text-blue-500';
+
+                const wpUrl = document.getElementById('wpUrl').value;
+                const wpUsername = document.getElementById('wpUsername').value;
+                const wpPassword = document.getElementById('wpPassword').value;
+
+                const updateData = {
+                    wpUrl: wpUrl,
+                    wpUsername: wpUsername,
+                };
+                // Only include password if user entered something
+                if (wpPassword) {
+                    updateData.wpPassword = wpPassword;
+                }
+
+                console.log('Saving user settings:', updateData);
+                try {
+                    // 직접 fetch를 사용하여 요청 - fetchAPI 함수 우회
+                    const response = await fetch('/api/user/settings', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+                        },
+                        body: JSON.stringify(updateData)
+                    });
+                    
+                    console.log('서버 응답 상태:', response.status);
+                    
+                    if (response.status === 200) {
+                        // 성공했다고 간주
+                        settingsMessageDiv.textContent = '설정이 성공적으로 저장되었습니다!';
+                        settingsMessageDiv.className = 'text-center text-sm mt-4 text-green-500';
+                        
+                        // Clear password field after successful save
+                        document.getElementById('wpPassword').value = '';
+                        document.getElementById('wpPassword').placeholder = '변경시에만 입력하세요';
+                        
+                        return; // 성공적으로 처리됨
+                    }
+                    
+                    // 응답을 JSON으로 파싱하려고 시도
+                    try {
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const data = await response.json();
+                            if (data && data.message) {
+                                throw new Error(data.message);
+                            }
+                        }
+                    } catch (jsonError) {
+                        console.error('JSON 파싱 오류:', jsonError);
+                    }
+                    
+                    // 일반적인 오류 처리
+                    throw new Error(`서버 응답 상태: ${response.status}`);
+                } catch (error) {
+                    console.error('설정 저장 오류:', error);
+                    settingsMessageDiv.textContent = '워드프레스 설정을 저장할 수 없습니다. 나중에 다시 시도해주세요.';
+                    settingsMessageDiv.className = 'text-center text-sm mt-4 text-red-500';
+                }
+            }
+
+            // --- Initial Load & Event Listeners --- 
+            loadUserSettings(); // Load user settings (like email)
+            loadSavedPosts(); // 저장된 글 목록 로드
+
+            if (logoutButton) {
+                logoutButton.addEventListener('click', () => {
+                    localStorage.removeItem('authToken');
+                    console.log('Token removed from localStorage.');
+                    window.location.href = '/login.html';
+                });
+            }
+
+            if (wpSettingsForm) {
+                wpSettingsForm.addEventListener('submit', saveUserSettings);
+            }
+            
+            // 예약 모달 이벤트 리스너
+            closeScheduleModalButton.addEventListener('click', closeScheduleModal);
+            cancelScheduleButton.addEventListener('click', closeScheduleModal);
+            schedulePostForm.addEventListener('submit', schedulePost);
+        });
+    </script>
+</body>
+</html> 

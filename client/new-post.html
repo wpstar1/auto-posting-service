@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>새 포스트 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- TinyMCE 에디터 -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- 네비게이션 바 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="userLevel" class="mr-4 text-sm text-gray-600"></span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex">
+            <!-- 사이드바 -->
+            <div class="w-64 bg-white shadow-lg h-screen">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="#" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        새 포스트
+                    </a>
+                    <a href="/images.html" class="flex items-center px-6 py-2 mt-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        이미지 관리
+                    </a>
+                    <a href="/scheduled.html" class="flex items-center px-6 py-2 mt-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        예약 포스트
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <h2 class="text-2xl font-bold mb-6">새 포스트 작성</h2>
+                    
+                    <form id="postForm" class="space-y-6">
+                        <!-- 워드프레스 계정 선택 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">워드프레스 계정</label>
+                            <select id="platformId" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                <option value="">계정을 선택하세요</option>
+                            </select>
+                        </div>
+
+                        <!-- 제목 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">제목</label>
+                            <input type="text" id="title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="포스트 제목을 입력하세요">
+                        </div>
+
+                        <!-- 내용 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">내용</label>
+                            <textarea id="content" class="mt-1 block w-full h-96"></textarea>
+                        </div>
+
+                        <!-- 이미지 선택 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">이미지</label>
+                            <div class="mt-1 flex items-center space-x-4">
+                                <button type="button" onclick="openImageSelector()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    이미지 선택
+                                </button>
+                                <div id="selectedImages" class="flex space-x-2">
+                                    <!-- 선택된 이미지들이 여기에 표시됩니다 -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 예약 설정 (VIP 전용) -->
+                        <div id="scheduleSection" class="border-t pt-6 hidden">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">예약 설정 (VIP 전용)</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">날짜</label>
+                                    <input type="date" id="scheduleDate" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" disabled>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">시간</label>
+                                    <input type="time" id="scheduleTime" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 버튼 -->
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" onclick="window.location.href='/dashboard.html'" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                취소
+                            </button>
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                포스트 작성
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 토큰 체크
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // TinyMCE 초기화
+        tinymce.init({
+            selector: '#content',
+            plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
+            toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            height: 400
+        });
+
+        // 워드프레스 계정 목록 로드
+        async function loadPlatforms() {
+            try {
+                const response = await fetch('/api/platforms', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const select = document.getElementById('platformId');
+                    data.platforms.forEach(platform => {
+                        const option = document.createElement('option');
+                        option.value = platform.id;
+                        option.textContent = platform.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('계정 목록 로드 실패:', error);
+            }
+        }
+
+        // 사용자 레벨 체크 및 UI 업데이트
+        async function checkUserLevel() {
+            try {
+                const response = await fetch('/api/user/level', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 사용자 레벨 표시
+                    document.getElementById('userLevel').textContent = `Level ${data.level}`;
+                    
+                    // VIP 기능 활성화/비활성화
+                    if (data.level === 'vip') {
+                        document.getElementById('scheduleSection').classList.remove('hidden');
+                        document.getElementById('scheduleDate').disabled = false;
+                        document.getElementById('scheduleTime').disabled = false;
+                    }
+                }
+            } catch (error) {
+                console.error('사용자 레벨 체크 실패:', error);
+            }
+        }
+
+        // 포스트 작성
+        document.getElementById('postForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const platformId = document.getElementById('platformId').value;
+            const title = document.getElementById('title').value;
+            const content = tinymce.get('content').getContent();
+            
+            if (!platformId || !title || !content) {
+                alert('모든 필수 항목을 입력해주세요.');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('platformId', platformId);
+                formData.append('title', title);
+                formData.append('content', content);
+                
+                // 예약 설정이 활성화된 경우
+                const scheduleDate = document.getElementById('scheduleDate');
+                const scheduleTime = document.getElementById('scheduleTime');
+                if (!scheduleDate.disabled && scheduleDate.value && scheduleTime.value) {
+                    const scheduledAt = new Date(`${scheduleDate.value}T${scheduleTime.value}`);
+                    formData.append('scheduledAt', scheduledAt.toISOString());
+                }
+                
+                const response = await fetch('/api/post', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    alert('포스트가 성공적으로 작성되었습니다.');
+                    window.location.href = '/dashboard.html';
+                } else {
+                    alert(data.message || '포스트 작성에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('포스트 작성 실패:', error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        });
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // 초기화
+        loadPlatforms();
+        checkUserLevel();
+    </script>
+</body>
+</html>

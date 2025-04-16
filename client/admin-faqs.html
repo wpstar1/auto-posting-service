@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자주 묻는 질문 관리 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="adminBadge" class="mr-4 px-2 py-1 bg-red-600 text-white rounded-md text-sm font-medium">관리자</span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex">
+            <!-- 사이드바 -->
+            <div class="w-64 bg-white shadow-lg h-screen">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/admin.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        관리자 메뉴
+                    </a>
+                    <a href="/admin-notices.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                        </svg>
+                        공지사항 관리
+                    </a>
+                    <a href="/admin-faqs.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        자주 묻는 질문 관리
+                    </a>
+                    <a href="/admin-inquiries.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+                        </svg>
+                        문의 관리
+                    </a>
+                    <a href="/admin-users.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        사용자 관리
+                    </a>
+                    <a href="/admin-system.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        시스템 설정
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10">
+                <div class="max-w-7xl mx-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-900">자주 묻는 질문 관리</h1>
+                        <button id="addFaqBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            새 질문 추가
+                        </button>
+                    </div>
+
+                    <!-- FAQ 목록 -->
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        카테고리
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        질문
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        상태
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        순서
+                                    </th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        작업
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="faqsList" class="bg-white divide-y divide-gray-200">
+                                <!-- FAQ 항목들이 여기에 삽입됩니다 -->
+                                <tr>
+                                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                                        로딩 중...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- FAQ 폼 모달 -->
+                    <div id="faqFormContainer" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center hidden z-50">
+                        <div class="bg-white rounded-lg p-8 max-w-2xl w-full">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 id="formTitle" class="text-xl font-bold">새 자주 묻는 질문 추가</h2>
+                                <button id="closeFormBtn" class="text-gray-500 hover:text-gray-800">
+                                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <form id="faqForm">
+                                <input type="hidden" id="faqId">
+                                <div class="mb-4">
+                                    <label for="faqCategory" class="block text-sm font-medium text-gray-700 mb-1">카테고리</label>
+                                    <select id="faqCategory" name="category" class="w-full p-2 border border-gray-300 rounded-md">
+                                        <option value="일반">일반</option>
+                                        <option value="계정">계정</option>
+                                        <option value="포스팅">포스팅</option>
+                                        <option value="결제">결제</option>
+                                        <option value="기타">기타</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="faqQuestion" class="block text-sm font-medium text-gray-700 mb-1">질문</label>
+                                    <input type="text" id="faqQuestion" name="question" class="w-full p-2 border border-gray-300 rounded-md" required>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="faqAnswer" class="block text-sm font-medium text-gray-700 mb-1">답변</label>
+                                    <textarea id="faqAnswer" name="answer" rows="6" class="w-full p-2 border border-gray-300 rounded-md" required></textarea>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mb-4">
+                                    <div>
+                                        <label for="faqOrder" class="block text-sm font-medium text-gray-700 mb-1">표시 순서</label>
+                                        <input type="number" id="faqOrder" name="order" class="w-full p-2 border border-gray-300 rounded-md" min="0" value="0">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                                        <div class="flex items-center space-x-4">
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" name="status" value="published" class="form-radio" checked>
+                                                <span class="ml-2">공개</span>
+                                            </label>
+                                            <label class="inline-flex items-center">
+                                                <input type="radio" name="status" value="draft" class="form-radio">
+                                                <span class="ml-2">임시저장</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end space-x-3">
+                                    <button type="button" id="cancelFaqBtn" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
+                                        취소
+                                    </button>
+                                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                        저장
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 토큰 체크 및 관리자 권한 확인
+        checkAdminAuth();
+        
+        function checkAdminAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // 관리자 권한 확인
+            fetch('/api/auth/check-admin', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success || !data.isAdmin) {
+                    alert('관리자 권한이 필요합니다.');
+                    window.location.href = '/dashboard.html';
+                }
+            })
+            .catch(err => {
+                console.error('관리자 권한 확인 오류:', err);
+                window.location.href = '/dashboard.html';
+            });
+        }
+        
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+        
+        // FAQ 목록 로드
+        async function loadFaqs() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/admin/faqs', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                const faqsList = document.getElementById('faqsList');
+                
+                if (data.success && data.faqs.length > 0) {
+                    faqsList.innerHTML = '';
+                    
+                    data.faqs.forEach(faq => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    ${faq.category}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm font-medium text-gray-900">
+                                    ${faq.question}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${faq.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                    ${faq.status === 'published' ? '공개' : '임시저장'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${faq.order}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <button onclick="editFaq('${faq._id}')" class="text-blue-600 hover:text-blue-900 mr-3">수정</button>
+                                <button onclick="deleteFaq('${faq._id}')" class="text-red-600 hover:text-red-900">삭제</button>
+                            </td>
+                        `;
+                        faqsList.appendChild(tr);
+                    });
+                } else {
+                    faqsList.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">등록된 자주 묻는 질문이 없습니다</td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('FAQ 로드 오류:', error);
+                document.getElementById('faqsList').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-red-500">자주 묻는 질문을 불러오는 중 오류가 발생했습니다</td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // FAQ 폼 초기화
+        function resetFaqForm() {
+            document.getElementById('faqId').value = '';
+            document.getElementById('faqQuestion').value = '';
+            document.getElementById('faqAnswer').value = '';
+            document.getElementById('faqCategory').value = '일반';
+            document.getElementById('faqOrder').value = '0';
+            document.querySelector('input[name="status"][value="published"]').checked = true;
+        }
+        
+        // FAQ 폼 표시
+        function showFaqForm() {
+            document.getElementById('formTitle').textContent = '새 자주 묻는 질문 추가';
+            resetFaqForm();
+            document.getElementById('faqFormContainer').classList.remove('hidden');
+        }
+        
+        // FAQ 폼 숨기기
+        function hideFaqForm() {
+            document.getElementById('faqFormContainer').classList.add('hidden');
+        }
+        
+        // FAQ 수정
+        async function editFaq(faqId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/admin/faqs/${faqId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const faq = data.faq;
+                    
+                    document.getElementById('formTitle').textContent = '자주 묻는 질문 수정';
+                    document.getElementById('faqId').value = faq._id;
+                    document.getElementById('faqQuestion').value = faq.question;
+                    document.getElementById('faqAnswer').value = faq.answer;
+                    document.getElementById('faqCategory').value = faq.category;
+                    document.getElementById('faqOrder').value = faq.order;
+                    document.querySelector(`input[name="status"][value="${faq.status}"]`).checked = true;
+                    
+                    document.getElementById('faqFormContainer').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('FAQ 상세 정보 로드 오류:', error);
+                alert('FAQ 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // FAQ 삭제
+        async function deleteFaq(faqId) {
+            if (!confirm('정말 이 FAQ를 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/admin/faqs/${faqId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('FAQ가 삭제되었습니다');
+                    loadFaqs();
+                } else {
+                    alert(result.message || 'FAQ 삭제 중 오류가 발생했습니다');
+                }
+            } catch (error) {
+                console.error('FAQ 삭제 오류:', error);
+                alert('FAQ 삭제 중 오류가 발생했습니다');
+            }
+        }
+        
+        // FAQ 저장
+        async function saveFaq(event) {
+            event.preventDefault();
+            
+            try {
+                const token = localStorage.getItem('token');
+                const faqId = document.getElementById('faqId').value;
+                const question = document.getElementById('faqQuestion').value;
+                const answer = document.getElementById('faqAnswer').value;
+                const category = document.getElementById('faqCategory').value;
+                const order = parseInt(document.getElementById('faqOrder').value);
+                const status = document.querySelector('input[name="status"]:checked').value;
+                
+                if (!question || !answer) {
+                    alert('질문과 답변을 모두 입력해주세요');
+                    return;
+                }
+                
+                const faqData = {
+                    question,
+                    answer,
+                    category,
+                    order,
+                    status
+                };
+                
+                let url = '/admin/faqs';
+                let method = 'POST';
+                
+                if (faqId) {
+                    url = `/admin/faqs/${faqId}`;
+                    method = 'PUT';
+                }
+                
+                const response = await fetch(url, {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(faqData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(faqId ? 'FAQ가 수정되었습니다' : 'FAQ가 추가되었습니다');
+                    hideFaqForm();
+                    loadFaqs();
+                } else {
+                    alert(result.message || 'FAQ 저장 중 오류가 발생했습니다');
+                }
+            } catch (error) {
+                console.error('FAQ 저장 오류:', error);
+                alert('FAQ 저장 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 이벤트 리스너 등록
+        document.addEventListener('DOMContentLoaded', function() {
+            // FAQ 목록 로드
+            loadFaqs();
+            
+            // 새 FAQ 버튼
+            document.getElementById('addFaqBtn').addEventListener('click', showFaqForm);
+            
+            // 폼 닫기 버튼
+            document.getElementById('closeFormBtn').addEventListener('click', hideFaqForm);
+            document.getElementById('cancelFaqBtn').addEventListener('click', hideFaqForm);
+            
+            // FAQ 폼 제출
+            document.getElementById('faqForm').addEventListener('submit', saveFaq);
+        });
+    </script>
+</body>
+</html>

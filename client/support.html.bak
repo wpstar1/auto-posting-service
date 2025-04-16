@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>고객센터 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* 모바일 메뉴 스타일 */
+        @media (max-width: 768px) {
+            .mobile-sidebar {
+                position: static;
+                order: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+            .mobile-menu-wrapper {
+                margin-bottom: 1rem;
+            }
+            .mobile-menu-content {
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+            }
+            .mobile-menu-content.active {
+                max-height: 300px;
+            }
+            .main-content {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex flex-col md:flex-row">
+            <!-- 모바일용 접이식 메뉴 -->
+            <div class="mobile-sidebar w-full md:w-64 bg-white shadow-lg md:h-screen">
+                <!-- 모바일에서만 보이는 메뉴 토글 버튼 -->
+                <div class="block md:hidden mobile-menu-wrapper p-4">
+                    <button id="menuToggle" class="flex w-full justify-between items-center px-4 py-2 bg-gray-100 rounded-md">
+                        <span class="font-medium">메뉴</span>
+                        <svg id="menuIcon" class="h-5 w-5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </button>
+                    <div id="mobileMenu" class="mobile-menu-content pt-2">
+                        <nav class="grid grid-cols-1 gap-1">
+                            <a href="/dashboard.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+                                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                </svg>
+                                대시보드
+                            </a>
+                            <a href="/auto-post.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+                                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                </svg>
+                                자동 포스팅
+                            </a>
+                            <a href="/platforms.html" class="flex items-center px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md">
+                                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                                </svg>
+                                계정 관리
+                            </a>
+                            <a href="/support.html" class="flex items-center px-4 py-2 text-gray-700 bg-gray-100 rounded-md">
+                                <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                </svg>
+                                고객센터
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+                
+                <!-- 데스크탑에서만 보이는 사이드바 메뉴 -->
+                <nav class="hidden md:block md:mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/auto-post.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        자동 포스팅
+                    </a>
+                    <a href="/platforms.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        계정 관리
+                    </a>
+                    <div class="border-t border-gray-200 my-4"></div>
+                    <a href="/support.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        고객센터
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="main-content flex-1 p-6 md:p-10">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-6">고객센터</h2>
+                            
+                            <!-- 이용 안내 -->
+                            <div class="mb-8 bg-blue-50 p-4 rounded-lg relative">
+                                <h3 class="text-lg font-medium text-blue-800 mb-2">고객센터 이용 안내</h3>
+                                <ul id="supportInfo" class="list-disc pl-5 text-blue-700 space-y-2">
+                                    <li>문의하신 내용은 <strong>관리자 대시보드</strong>에서 확인 가능합니다.</li>
+                                    <li>VIP 회원은 문의 우선 처리 혜택을 받습니다.</li>
+                                    <li>시스템 설정은 관리자 계정으로 로그인 후 <strong>설정 &gt; 시스템 설정</strong> 메뉴를 이용해주세요.</li>
+                                    <li>가입 시 제공된 <strong>관리자 계정 정보</strong>로 로그인 시 관리자 기능을 이용할 수 있습니다.</li>
+                                </ul>
+                                <button id="editSupportInfoBtn" class="absolute top-2 right-2 bg-blue-600 text-white rounded-md p-1 hidden">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <!-- 공지사항 -->
+                            <div class="mb-8 relative">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">공지사항</h3>
+                                <div class="space-y-4" id="notices">
+                                    <!-- 공지사항 목록이 여기에 동적으로 추가됩니다 -->
+                                </div>
+                                <button id="addNoticeBtn" class="absolute top-0 right-0 bg-green-600 text-white rounded-md p-1 hidden">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- 자주 묻는 질문 -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">자주 묻는 질문</h3>
+                                <div class="space-y-4" id="faq">
+                                    <!-- FAQ 목록이 여기에 동적으로 추가됩니다 -->
+                                </div>
+                            </div>
+
+                            <!-- 문의하기 -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">문의하기</h3>
+                                <form id="inquiryForm" class="space-y-4">
+                                    <div>
+                                        <label for="inquiryTitle" class="block text-sm font-medium text-gray-700">제목</label>
+                                        <input type="text" id="inquiryTitle" name="title" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    </div>
+                                    <div>
+                                        <label for="inquiryContent" class="block text-sm font-medium text-gray-700">내용</label>
+                                        <textarea id="inquiryContent" name="content" rows="4" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                                    </div>
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                            문의하기
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 내 문의 내역 -->
+        <div class="mt-10 max-w-4xl mx-auto">
+            <h3 class="text-lg font-medium text-gray-900 mb-4 text-center">내 문의 내역</h3>
+            <div class="bg-white shadow-lg rounded-lg border border-gray-200 mb-6 overflow-hidden">
+                <div id="myInquiriesList" class="divide-y divide-gray-200">
+                    <div class="p-4 text-center text-sm text-gray-500">
+                        문의 내역을 불러오는 중...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // 토큰 체크
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // 초기 로드
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotices();
+            loadFAQ();
+            checkAdminStatus();
+            loadMyInquiries(); // 내 문의 내역 불러오기
+            
+            // 문의하기 폼 제출 이벤트
+            document.getElementById('inquiryForm').addEventListener('submit', submitInquiry);
+            
+            // 모바일 메뉴 토글 이벤트
+            document.getElementById('menuToggle').addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobileMenu');
+                const menuIcon = document.getElementById('menuIcon');
+                mobileMenu.classList.toggle('active');
+                menuIcon.classList.toggle('rotate-180');
+            });
+        });
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // 관리자 권한 확인
+        async function checkAdminStatus() {
+            try {
+                const response = await fetch('/api/auth/check-admin', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.isAdmin) {
+                    // 관리자인 경우 수정 버튼 표시
+                    document.getElementById('editSupportInfoBtn').classList.remove('hidden');
+                    document.getElementById('addNoticeBtn').classList.remove('hidden');
+                    
+                    // 공지사항 수정/삭제 버튼 표시
+                    const notices = document.querySelectorAll('.notice-item');
+                    notices.forEach(notice => {
+                        const controls = notice.querySelector('.notice-controls');
+                        if (controls) controls.classList.remove('hidden');
+                    });
+                    
+                    // 이벤트 리스너 추가
+                    document.getElementById('editSupportInfoBtn').addEventListener('click', editSupportInfo);
+                    document.getElementById('addNoticeBtn').addEventListener('click', showAddNoticeForm);
+                }
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+            }
+        }
+
+        // 공지사항 로드
+        async function loadNotices() {
+            try {
+                const response = await fetch('/api/support/notices');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const container = document.getElementById('notices');
+                    container.innerHTML = '';
+                    
+                    if (data.data && data.data.length > 0) {
+                        data.data.forEach(notice => {
+                            const div = document.createElement('div');
+                            div.className = 'border-b border-gray-200 pb-4 notice-item relative';
+                            div.setAttribute('data-id', notice._id);
+                            div.innerHTML = `
+                                <h4 class="text-lg font-medium mb-2">${notice.title}</h4>
+                                <p class="text-gray-600">${notice.content}</p>
+                                <p class="text-sm text-gray-500 mt-2">${new Date(notice.createdAt).toLocaleDateString()}</p>
+                                <div class="notice-controls hidden absolute top-0 right-0 flex space-x-1">
+                                    <button class="edit-notice-btn bg-blue-600 text-white rounded-md p-1">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="delete-notice-btn bg-red-600 text-white rounded-md p-1">
+                                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                </div>
+                            `;
+                            container.appendChild(div);
+                            
+                            // 이벤트 리스너 추가
+                            const editBtn = div.querySelector('.edit-notice-btn');
+                            const deleteBtn = div.querySelector('.delete-notice-btn');
+                            
+                            if (editBtn) {
+                                editBtn.addEventListener('click', function() {
+                                    editNotice(notice._id);
+                                });
+                            }
+                            
+                            if (deleteBtn) {
+                                deleteBtn.addEventListener('click', function() {
+                                    deleteNotice(notice._id);
+                                });
+                            }
+                        });
+                        
+                        // 관리자 상태 다시 확인
+                        checkAdminStatus();
+                    } else {
+                        container.innerHTML = '<p class="text-gray-500">등록된 공지사항이 없습니다.</p>';
+                    }
+                } else {
+                    document.getElementById('notices').innerHTML = '<p class="text-gray-500">공지사항을 불러오는데 실패했습니다.</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('notices').innerHTML = '<p class="text-gray-500">공지사항을 불러오는데 실패했습니다.</p>';
+            }
+        }
+
+        // FAQ 로드
+        async function loadFAQ() {
+            try {
+                const response = await fetch('/api/support/faqs');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const container = document.getElementById('faq');
+                    container.innerHTML = '';
+                    
+                    if (data.faqs && data.faqs.length > 0) {
+                        const groupedFaqs = {};
+                        
+                        // FAQ를 카테고리별로 그룹화
+                        data.faqs.forEach(item => {
+                            if (!groupedFaqs[item.category]) {
+                                groupedFaqs[item.category] = [];
+                            }
+                            groupedFaqs[item.category].push(item);
+                        });
+                        
+                        // 카테고리별로 표시
+                        Object.keys(groupedFaqs).forEach(category => {
+                            const categoryDiv = document.createElement('div');
+                            categoryDiv.className = 'mb-6';
+                            categoryDiv.innerHTML = `
+                                <h4 class="text-base font-medium text-gray-800 mb-3">${category}</h4>
+                            `;
+                            
+                            // 해당 카테고리의 FAQ 항목들
+                            const itemsDiv = document.createElement('div');
+                            itemsDiv.className = 'space-y-4';
+                            
+                            groupedFaqs[category].forEach(item => {
+                                const faqItem = document.createElement('div');
+                                faqItem.className = 'border-b border-gray-200 pb-4';
+                                faqItem.innerHTML = `
+                                    <button class="flex justify-between items-center w-full text-left" onclick="toggleFAQ(this)">
+                                        <span class="text-base font-medium">${item.question}</span>
+                                        <svg class="h-5 w-5 transform transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                    <div class="mt-4 hidden">
+                                        <p class="text-gray-600">${item.answer}</p>
+                                    </div>
+                                `;
+                                itemsDiv.appendChild(faqItem);
+                            });
+                            
+                            categoryDiv.appendChild(itemsDiv);
+                            container.appendChild(categoryDiv);
+                        });
+                    } else {
+                        container.innerHTML = '<p class="text-gray-500">등록된 FAQ가 없습니다.</p>';
+                    }
+                } else {
+                    document.getElementById('faq').innerHTML = '<p class="text-gray-500">FAQ 목록을 불러오는데 실패했습니다.</p>';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('faq').innerHTML = '<p class="text-gray-500">FAQ 목록을 불러오는데 실패했습니다.</p>';
+            }
+        }
+
+        // FAQ 토글
+        function toggleFAQ(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('svg');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+            } else {
+                content.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+            }
+        }
+
+        // 문의하기 제출
+        async function submitInquiry(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('inquiryTitle').value;
+            const content = document.getElementById('inquiryContent').value;
+            
+            if (!title || !content) {
+                alert('제목과 내용을 모두 입력해주세요.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/support/inquiries', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ title, content })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('문의가 성공적으로 등록되었습니다.');
+                    document.getElementById('inquiryTitle').value = '';
+                    document.getElementById('inquiryContent').value = '';
+                    refreshMyInquiries(); // 내 문의 내역 새로고침
+                } else {
+                    alert(data.message || '문의 등록에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        }
+        
+        // 고객센터 이용 안내 수정
+        function editSupportInfo() {
+            try {
+                const infoContainer = document.getElementById('supportInfo');
+                const currentInfo = infoContainer.innerHTML;
+                
+                // 수정 폼 생성
+                const form = document.createElement('div');
+                form.innerHTML = `
+                    <textarea id="supportInfoEditor" class="w-full h-40 p-2 border border-blue-300 rounded" style="background-color: white;">${currentInfo}</textarea>
+                    <div class="flex justify-end mt-2">
+                        <button id="cancelSupportInfoEdit" class="px-3 py-1 bg-gray-500 text-white rounded mr-2">취소</button>
+                        <button id="saveSupportInfoEdit" class="px-3 py-1 bg-blue-600 text-white rounded">저장</button>
+                    </div>
+                `;
+                
+                // 현재 내용 대신 폼 표시
+                infoContainer.parentNode.replaceChild(form, infoContainer);
+                
+                // 취소 버튼 이벤트
+                document.getElementById('cancelSupportInfoEdit').addEventListener('click', function() {
+                    form.parentNode.innerHTML = `
+                        <ul id="supportInfo" class="list-disc pl-5 text-blue-700 space-y-2">
+                            ${currentInfo}
+                        </ul>
+                        <button id="editSupportInfoBtn" class="absolute top-2 right-2 bg-blue-600 text-white rounded-md p-1">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                            </svg>
+                        </button>
+                    `;
+                    const editBtn = document.getElementById('editSupportInfoBtn');
+                    if (editBtn) {
+                        editBtn.addEventListener('click', editSupportInfo);
+                    }
+                });
+                
+                // 저장 버튼 이벤트
+                document.getElementById('saveSupportInfoEdit').addEventListener('click', async function() {
+                    try {
+                        const newContent = document.getElementById('supportInfoEditor').value;
+                        
+                        // 변경사항 적용
+                        form.parentNode.innerHTML = `
+                            <ul id="supportInfo" class="list-disc pl-5 text-blue-700 space-y-2">
+                                ${newContent}
+                            </ul>
+                            <button id="editSupportInfoBtn" class="absolute top-2 right-2 bg-blue-600 text-white rounded-md p-1">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
+                                </svg>
+                            </button>
+                        `;
+                        const editBtn = document.getElementById('editSupportInfoBtn');
+                        if (editBtn) {
+                            editBtn.addEventListener('click', editSupportInfo);
+                        }
+                        
+                        // 서버에 저장하는 로직 추가
+                        saveInfoToServer(newContent);
+                    } catch (error) {
+                        console.error('고객센터 안내 저장 오류:', error);
+                        alert('고객센터 안내를 저장하는 중 오류가 발생했습니다.');
+                    }
+                });
+            } catch (error) {
+                console.error('고객센터 안내 수정 오류:', error);
+                alert('고객센터 안내를 수정하는 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 고객센터 이용 안내 서버 저장 함수
+        async function saveInfoToServer(content) {
+            try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    alert('로그인이 필요합니다');
+                    return;
+                }
+                
+                const response = await fetch('/api/support/info', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ content })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('고객센터 이용 안내가 성공적으로 저장되었습니다.');
+                } else {
+                    alert(result.message || '고객센터 이용 안내 저장에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('이용 안내 저장 오류:', error);
+                alert('이용 안내를 저장하는 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 공지사항 추가 폼 표시
+        function showAddNoticeForm() {
+            // 이미 폼이 있으면 제거
+            const existingForm = document.getElementById('noticeForm');
+            if (existingForm) existingForm.remove();
+            
+            const noticesContainer = document.getElementById('notices');
+            
+            const formDiv = document.createElement('div');
+            formDiv.id = 'noticeForm';
+            formDiv.className = 'bg-gray-50 p-4 rounded-lg mb-4 border border-gray-200';
+            formDiv.innerHTML = `
+                <h4 class="text-lg font-medium mb-3">새 공지사항 작성</h4>
+                <form id="newNoticeForm">
+                    <div class="mb-3">
+                        <label for="noticeTitle" class="block text-sm font-medium text-gray-700 mb-1">제목</label>
+                        <input type="text" id="noticeTitle" class="w-full p-2 border border-gray-300 rounded">
+                    </div>
+                    <div class="mb-3">
+                        <label for="noticeContent" class="block text-sm font-medium text-gray-700 mb-1">내용</label>
+                        <textarea id="noticeContent" rows="4" class="w-full p-2 border border-gray-300 rounded"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">중요 공지</label>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="noticeImportant" class="mr-2">
+                            <label for="noticeImportant">중요 공지로 표시</label>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="button" id="cancelNoticeBtn" class="px-3 py-1 bg-gray-500 text-white rounded mr-2">취소</button>
+                        <button type="submit" class="px-3 py-1 bg-green-600 text-white rounded">저장</button>
+                    </div>
+                </form>
+            `;
+            
+            // 폼을 공지사항 목록 위에 추가
+            noticesContainer.parentNode.insertBefore(formDiv, noticesContainer);
+            
+            // 취소 버튼 이벤트
+            document.getElementById('cancelNoticeBtn').addEventListener('click', function() {
+                formDiv.remove();
+            });
+            
+            // 폼 제출 이벤트
+            document.getElementById('newNoticeForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const title = document.getElementById('noticeTitle').value;
+                const content = document.getElementById('noticeContent').value;
+                const important = document.getElementById('noticeImportant').checked;
+                
+                if (!title || !content) {
+                    alert('제목과 내용을 모두 입력해주세요.');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/support/notices', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ 
+                            title, 
+                            content, 
+                            important,
+                            status: 'active'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('공지사항이 등록되었습니다.');
+                        formDiv.remove();
+                        loadNotices(); // 공지사항 목록 새로고침
+                    } else {
+                        alert(data.message || '공지사항 등록에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('서버 오류가 발생했습니다.');
+                }
+            });
+        }
+        
+        // 공지사항 수정
+        async function editNotice(id) {
+            try {
+                // 공지사항 상세 정보 가져오기
+                const response = await fetch(`/api/support/notices/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    const notice = data.data;
+                    const noticeElement = document.querySelector(`.notice-item[data-id="${id}"]`);
+                    
+                    if (!noticeElement) return;
+                    
+                    // 원래 내용 저장
+                    const originalContent = noticeElement.innerHTML;
+                    
+                    // 수정 폼으로 변경
+                    noticeElement.innerHTML = `
+                        <div class="edit-notice-form">
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">제목</label>
+                                <input type="text" id="editNoticeTitle" class="w-full p-2 border border-gray-300 rounded" value="${notice.title}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">내용</label>
+                                <textarea id="editNoticeContent" rows="4" class="w-full p-2 border border-gray-300 rounded">${notice.content}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                                <select id="editNoticeStatus" class="w-full p-2 border border-gray-300 rounded">
+                                    <option value="active" ${notice.status === 'active' ? 'selected' : ''}>활성</option>
+                                    <option value="inactive" ${notice.status === 'inactive' ? 'selected' : ''}>비활성</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="flex items-center text-sm font-medium text-gray-700">
+                                    <input type="checkbox" id="editNoticeImportant" class="mr-2" ${notice.important ? 'checked' : ''}>
+                                    중요 공지로 표시
+                                </label>
+                            </div>
+                            <div class="flex justify-end">
+                                <button type="button" id="cancelEditNotice" class="px-3 py-1 bg-gray-500 text-white rounded mr-2">취소</button>
+                                <button type="button" id="saveEditNotice" class="px-3 py-1 bg-blue-600 text-white rounded">저장</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 취소 버튼 이벤트
+                    document.getElementById('cancelEditNotice').addEventListener('click', function() {
+                        noticeElement.innerHTML = originalContent;
+                        addNoticeControlEvents(noticeElement, id);
+                    });
+                    
+                    // 저장 버튼 이벤트
+                    document.getElementById('saveEditNotice').addEventListener('click', async function() {
+                        const updatedTitle = document.getElementById('editNoticeTitle').value;
+                        const updatedContent = document.getElementById('editNoticeContent').value;
+                        const updatedStatus = document.getElementById('editNoticeStatus').value;
+                        const updatedImportant = document.getElementById('editNoticeImportant').checked;
+                        
+                        if (!updatedTitle || !updatedContent) {
+                            alert('제목과 내용을 모두 입력해주세요.');
+                            return;
+                        }
+                        
+                        try {
+                            const updateResponse = await fetch(`/api/support/notices/${id}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    title: updatedTitle,
+                                    content: updatedContent,
+                                    status: updatedStatus,
+                                    important: updatedImportant
+                                })
+                            });
+                            
+                            const updateData = await updateResponse.json();
+                            
+                            if (updateData.success) {
+                                alert('공지사항이 수정되었습니다.');
+                                loadNotices(); // 공지사항 목록 새로고침
+                            } else {
+                                alert(updateData.message || '공지사항 수정에 실패했습니다.');
+                                noticeElement.innerHTML = originalContent;
+                                addNoticeControlEvents(noticeElement, id);
+                            }
+                        } catch (error) {
+                            console.error('Error updating notice:', error);
+                            alert('서버 오류가 발생했습니다.');
+                            noticeElement.innerHTML = originalContent;
+                            addNoticeControlEvents(noticeElement, id);
+                        }
+                    });
+                } else {
+                    alert(data.message || '공지사항 정보를 가져오는데 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        }
+        
+        // 공지사항 삭제
+        async function deleteNotice(id) {
+            if (!confirm('정말로 이 공지사항을 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/support/notices/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('공지사항이 삭제되었습니다.');
+                    loadNotices(); // 공지사항 목록 새로고침
+                } else {
+                    alert(data.message || '공지사항 삭제에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        }
+        
+        // 공지사항 아이템에 이벤트 리스너 추가 헬퍼 함수
+        function addNoticeControlEvents(noticeElement, id) {
+            const editBtn = noticeElement.querySelector('.edit-notice-btn');
+            const deleteBtn = noticeElement.querySelector('.delete-notice-btn');
+            
+            if (editBtn) {
+                editBtn.addEventListener('click', function() {
+                    editNotice(id);
+                });
+            }
+            
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    deleteNotice(id);
+                });
+            }
+        }
+        
+        // 내 문의 내역 불러오기
+        async function loadMyInquiries() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/support/my-inquiries', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                console.log("문의 내역 응답:", data); // 디버깅용 로그 추가
+                
+                const container = document.getElementById('myInquiriesList');
+                container.innerHTML = '';
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    data.data.forEach(inquiry => {
+                        const div = document.createElement('div');
+                        div.className = 'p-4 hover:bg-gray-50 transition-colors';
+                        
+                        // 상태에 따른 배지 색상 결정
+                        let statusBadge = '';
+                        if (inquiry.status === 'pending') {
+                            statusBadge = '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">대기중</span>';
+                        } else if (inquiry.status === 'in-progress') {
+                            statusBadge = '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">처리중</span>';
+                        } else if (inquiry.status === 'completed') {
+                            statusBadge = '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">완료</span>';
+                        }
+                        
+                        // 문의 내용 및 답변 HTML 구성
+                        let inquiryHtml = `
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-lg font-medium">${inquiry.title}</h4>
+                                ${statusBadge}
+                            </div>
+                            <p class="text-sm text-gray-500 mb-2">등록일: ${new Date(inquiry.createdAt).toLocaleDateString()}</p>
+                            <div class="mb-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                <p class="text-gray-700 whitespace-pre-line">${inquiry.content}</p>
+                            </div>
+                        `;
+                        
+                        // 답변이 있는 경우에만 답변 내용 추가
+                        if (inquiry.response) {
+                            inquiryHtml += `
+                                <div class="mt-2">
+                                    <h5 class="text-sm font-medium text-gray-700 mb-1">관리자 답변</h5>
+                                    <div class="p-3 bg-blue-50 rounded-md border border-blue-200">
+                                        <p class="text-gray-700 whitespace-pre-line">${inquiry.response}</p>
+                                        <p class="text-xs text-gray-500 mt-1">답변일: ${new Date(inquiry.updatedAt).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        div.innerHTML = inquiryHtml;
+                        container.appendChild(div);
+                    });
+                } else {
+                    container.innerHTML = '<div class="p-4 text-center text-sm text-gray-500">문의 내역이 없습니다</div>';
+                }
+            } catch (error) {
+                console.error('Error loading inquiries:', error);
+                document.getElementById('myInquiriesList').innerHTML = 
+                    '<div class="p-4 text-center text-sm text-gray-500">문의 내역을 불러오는데 실패했습니다</div>';
+            }
+        }
+        
+        // 문의 제출 후 내 문의 내역 새로고침
+        function refreshMyInquiries() {
+            loadMyInquiries();
+        }
+    </script>
+</body>
+</html>

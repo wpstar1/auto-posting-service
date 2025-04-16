@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대시보드 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="remainingPosts" class="mr-4 text-sm text-gray-600">오늘 남은 포스팅: -</span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex flex-col md:flex-row">
+            <!-- 사이드바: 데스크탑에서는 좌측, 모바일에서는 상단에 표시 -->
+            <div class="w-full md:w-64 bg-white shadow-lg md:h-screen overflow-y-auto">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/auto-post.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        자동 포스팅
+                    </a>
+                    <a href="/platforms.html" class="flex items-center px-6 py-2 mt-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        계정 관리
+                    </a>
+                    <div class="border-t border-gray-200 my-4"></div>
+                    <a href="/support.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        고객센터
+                    </a>
+                    <div id="adminMenu" class="hidden">
+                        <div class="border-t border-gray-200 my-4"></div>
+                        <a href="/admin.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            관리자
+                        </a>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 자동 포스팅 상태 -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">자동 포스팅 상태</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500">오늘 남은 포스팅</p>
+                                <p class="text-2xl font-semibold" id="dashboardRemainingPosts">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">다음 예정 포스팅</p>
+                                <p class="text-md" id="nextScheduledPost">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 계정 상태 -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">계정 상태</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-sm text-gray-500">등록된 워드프레스 계정</p>
+                                <p class="text-2xl font-semibold" id="registeredAccounts">-</p>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500">활성 계정</p>
+                                <p class="text-2xl font-semibold" id="activeAccounts">-</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 최근 활동 -->
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <h3 class="text-lg font-medium text-gray-900 mb-4">최근 활동</h3>
+                        <div class="space-y-4" id="recentActivities">
+                            <!-- 최근 활동 목록이 여기에 동적으로 추가됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 토큰 체크
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // 대시보드 데이터 로드
+        async function loadDashboardData() {
+            try {
+                // 통합 대시보드 통계 가져오기
+                const statsResponse = await fetch('/dashboard/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!statsResponse.ok) {
+                    throw new Error('통계 데이터를 불러오는데 실패했습니다.');
+                }
+                
+                const statsData = await statsResponse.json();
+                
+                if (statsData.success) {
+                    const stats = statsData.stats;
+                    
+                    // 1. 남은 포스팅 정보 업데이트
+                    document.getElementById('dashboardRemainingPosts').textContent = stats.posts.remaining;
+                    document.getElementById('remainingPosts').textContent = `오늘 남은 포스팅: ${stats.posts.remaining}`;
+                    
+                    // 2. 계정 상태 업데이트
+                    document.getElementById('registeredAccounts').textContent = stats.accounts.total || 0;
+                    document.getElementById('activeAccounts').textContent = stats.accounts.active || 0;
+                    
+                    // 3. 다음 예정 포스팅 업데이트
+                    if (stats.nextScheduledPost) {
+                        document.getElementById('nextScheduledPost').textContent = 
+                            new Date(stats.nextScheduledPost.scheduledTime).toLocaleString();
+                    } else {
+                        document.getElementById('nextScheduledPost').textContent = '예약된 포스팅이 없습니다';
+                    }
+                    
+                    // 4. 최근 활동 업데이트
+                    const activitiesContainer = document.getElementById('recentActivities');
+                    activitiesContainer.innerHTML = '';
+                    
+                    if (stats.recentActivities && stats.recentActivities.length > 0) {
+                        stats.recentActivities.forEach(activity => {
+                            const div = document.createElement('div');
+                            div.className = 'flex items-center space-x-2 text-sm text-gray-600 mb-2';
+                            div.innerHTML = `
+                                <span class="text-xs text-gray-500">${new Date(activity.createdAt).toLocaleString()}</span>
+                                <span class="ml-2">${activity.action || '활동'} ${activity.details ? `- ${activity.details}` : ''}</span>
+                            `;
+                            activitiesContainer.appendChild(div);
+                        });
+                    } else {
+                        activitiesContainer.innerHTML = '<p class="text-sm text-gray-500">최근 활동이 없습니다</p>';
+                    }
+                } else {
+                    console.error('Error loading dashboard data:', statsData.message);
+                    // 실패했을 경우 개별 API 호출로 시도
+                    await loadIndividualDashboardData();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                // 통합 API 실패 시 개별 API 호출
+                await loadIndividualDashboardData();
+            }
+        }
+        
+        // 각 정보를 개별 API를 통해 로드 (통합 API 실패 시 대체 방법)
+        async function loadIndividualDashboardData() {
+            try {
+                // 1. 남은 포스팅 수 업데이트
+                const remainingResponse = await fetch('/dashboard/remaining-posts', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const remainingData = await remainingResponse.json();
+                if (remainingData.success) {
+                    document.getElementById('dashboardRemainingPosts').textContent = remainingData.remaining;
+                    document.getElementById('remainingPosts').textContent = `오늘 남은 포스팅: ${remainingData.remaining}`;
+                }
+
+                // 2. 계정 상태 업데이트
+                const accountsResponse = await fetch('/dashboard/accounts', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const accountsData = await accountsResponse.json();
+                if (accountsData.success) {
+                    document.getElementById('registeredAccounts').textContent = accountsData.total || 0;
+                    document.getElementById('activeAccounts').textContent = accountsData.active || 0;
+                }
+
+                // 3. 최근 활동 업데이트
+                const activitiesResponse = await fetch('/dashboard/activities', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const activitiesData = await activitiesResponse.json();
+                if (activitiesData.success) {
+                    const activitiesContainer = document.getElementById('recentActivities');
+                    activitiesContainer.innerHTML = '';
+                    
+                    if (activitiesData.activities && activitiesData.activities.length > 0) {
+                        activitiesData.activities.slice(0, 5).forEach(activity => {
+                            const div = document.createElement('div');
+                            div.className = 'flex items-center space-x-2 text-sm text-gray-600 mb-2';
+                            div.innerHTML = `
+                                <span class="text-xs text-gray-500">${new Date(activity.createdAt).toLocaleString()}</span>
+                                <span class="ml-2">${activity.action || '활동'} ${activity.details ? `- ${activity.details}` : ''}</span>
+                            `;
+                            activitiesContainer.appendChild(div);
+                        });
+                    } else {
+                        activitiesContainer.innerHTML = '<p class="text-sm text-gray-500">최근 활동이 없습니다</p>';
+                    }
+                }
+
+                // 4. 다음 예정 포스팅 업데이트
+                const scheduleResponse = await fetch('/dashboard/next-post', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const scheduleData = await scheduleResponse.json();
+                if (scheduleData.success && scheduleData.nextPost) {
+                    document.getElementById('nextScheduledPost').textContent = 
+                        new Date(scheduleData.nextPost.scheduledTime).toLocaleString();
+                } else {
+                    document.getElementById('nextScheduledPost').textContent = '예약된 포스팅이 없습니다';
+                }
+            } catch (error) {
+                console.error('Error in individual data loading:', error);
+                // 기본값 설정
+                document.getElementById('dashboardRemainingPosts').textContent = '0';
+                document.getElementById('remainingPosts').textContent = '오늘 남은 포스팅: 0';
+                document.getElementById('registeredAccounts').textContent = '0';
+                document.getElementById('activeAccounts').textContent = '0';
+                document.getElementById('nextScheduledPost').textContent = '예약된 포스팅이 없습니다';
+                document.getElementById('recentActivities').innerHTML = '<p class="text-sm text-gray-500">최근 활동 정보를 불러올 수 없습니다</p>';
+            }
+        }
+
+        // 초기 로드
+        loadDashboardData();
+
+        // 사용자 권한 확인 및 관리자 메뉴 표시
+        async function checkUserRole() {
+            try {
+                const response = await fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.user) {
+                    // 사용자 정보를 로컬 스토리지에 업데이트 (VIP 상태 변경 반영)
+                    localStorage.setItem('userInfo', JSON.stringify({
+                        id: data.user._id,
+                        username: data.user.username,
+                        email: data.user.email,
+                        level: data.user.level,
+                        membershipStatus: data.user.membershipStatus,
+                        role: data.user.role
+                    }));
+                    
+                    // 관리자 메뉴 표시
+                    if (data.user.role === 'admin') {
+                        document.getElementById('adminMenu').classList.remove('hidden');
+                    }
+                }
+            } catch (error) {
+                console.error('사용자 정보 확인 오류:', error);
+            }
+        }
+
+        // 5분마다 데이터 갱신
+        setInterval(loadDashboardData, 5 * 60 * 1000);
+        
+        // 페이지 로드 시 사용자 권한 확인
+        checkUserRole();
+    </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 포스트 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- 네비게이션 바 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="userLevel" class="mr-4 text-sm text-gray-600"></span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex">
+            <!-- 사이드바 -->
+            <div class="w-64 bg-white shadow-lg h-screen">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/new-post.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        새 포스트
+                    </a>
+                    <a href="/images.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        </svg>
+                        이미지 관리
+                    </a>
+                    <a href="#" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        예약 포스트
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10">
+                <!-- VIP 전용 안내 메시지 -->
+                <div id="vipOnlyMessage" class="hidden">
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-yellow-800">VIP 전용 기능</h3>
+                                <div class="mt-2 text-sm text-yellow-700">
+                                    <p>예약 포스팅은 VIP 회원 전용 기능입니다. VIP로 업그레이드하시면 다음 기능을 사용하실 수 있습니다:</p>
+                                    <ul class="list-disc list-inside mt-2">
+                                        <li>무제한 예약 포스팅</li>
+                                        <li>다중 계정 관리</li>
+                                        <li>고급 설정</li>
+                                    </ul>
+                                    <a href="#" class="block mt-4 text-sm font-medium text-yellow-800 hover:text-yellow-900">
+                                        VIP로 업그레이드하기 →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VIP 회원용 컨텐츠 -->
+                <div id="vipContent" class="hidden">
+                    <div class="bg-white rounded-lg shadow-lg p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">예약된 포스트</h2>
+                            <a href="/new-post.html" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                                새 예약 포스트
+                            </a>
+                        </div>
+
+                        <!-- 필터 -->
+                        <div class="mb-6 flex space-x-4">
+                            <select id="statusFilter" class="rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                <option value="all">모든 상태</option>
+                                <option value="scheduled">예약됨</option>
+                                <option value="published">발행됨</option>
+                                <option value="failed">실패</option>
+                            </select>
+                            <select id="platformFilter" class="rounded-md border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50">
+                                <option value="all">모든 계정</option>
+                            </select>
+                        </div>
+
+                        <!-- 예약 포스트 목록 -->
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">계정</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">예약 시간</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="scheduledPosts">
+                                    <!-- 포스트 목록이 여기에 동적으로 추가됩니다 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 토큰 체크
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // 사용자 레벨 체크
+        async function checkUserLevel() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const isVip = data.user.level === 'vip';
+                    document.getElementById('userLevel').textContent = isVip ? 'VIP 회원' : 'Level 1';
+                    
+                    // VIP 여부에 따라 컨텐츠 표시
+                    document.getElementById('vipOnlyMessage').style.display = isVip ? 'none' : 'block';
+                    document.getElementById('vipContent').style.display = isVip ? 'block' : 'none';
+
+                    if (isVip) {
+                        loadPlatforms();
+                        loadScheduledPosts();
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 워드프레스 계정 목록 로드
+        async function loadPlatforms() {
+            try {
+                const response = await fetch('http://localhost:5000/api/platforms', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const select = document.getElementById('platformFilter');
+                    data.platforms.forEach(platform => {
+                        const option = document.createElement('option');
+                        option.value = platform._id;
+                        option.textContent = platform.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 예약 포스트 목록 로드
+        async function loadScheduledPosts() {
+            try {
+                const status = document.getElementById('statusFilter').value;
+                const platformId = document.getElementById('platformFilter').value;
+                
+                let url = 'http://localhost:5000/api/posts/scheduled';
+                if (status !== 'all') url += `?status=${status}`;
+                if (platformId !== 'all') url += `${status === 'all' ? '?' : '&'}platformId=${platformId}`;
+
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const tbody = document.getElementById('scheduledPosts');
+                    tbody.innerHTML = data.posts.map(post => `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900">${post.title}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500">${post.platform.name}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-500">${new Date(post.scheduledTime).toLocaleString()}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    ${post.status === 'scheduled' ? 'bg-yellow-100 text-yellow-800' : 
+                                      post.status === 'published' ? 'bg-green-100 text-green-800' : 
+                                      'bg-red-100 text-red-800'}">
+                                    ${post.status === 'scheduled' ? '예약됨' : 
+                                      post.status === 'published' ? '발행됨' : '실패'}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="editPost('${post._id}')" class="text-blue-600 hover:text-blue-900 mr-4">수정</button>
+                                <button onclick="deletePost('${post._id}')" class="text-red-600 hover:text-red-900">삭제</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 포스트 수정
+        function editPost(id) {
+            window.location.href = `/new-post.html?id=${id}`;
+        }
+
+        // 포스트 삭제
+        async function deletePost(id) {
+            if (!confirm('예약된 포스트를 삭제하시겠습니까?')) return;
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/posts/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('포스트가 삭제되었습니다.');
+                    loadScheduledPosts();
+                } else {
+                    alert(data.error || '삭제 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 필터 변경 이벤트
+        document.getElementById('statusFilter').addEventListener('change', loadScheduledPosts);
+        document.getElementById('platformFilter').addEventListener('change', loadScheduledPosts);
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // 초기화
+        checkUserLevel();
+    </script>
+</body>
+</html>

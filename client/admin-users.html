@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 관리 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="adminBadge" class="mr-4 px-2 py-1 bg-red-600 text-white rounded-md text-sm font-medium">관리자</span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex flex-col md:flex-row">
+            <!-- 사이드바: 데스크탑에서는 좌측, 모바일에서는 상단에 표시 -->
+            <div class="w-full md:w-64 bg-white shadow-lg md:h-screen overflow-y-auto">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/admin.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        관리자 메뉴
+                    </a>
+                    <a href="/admin-notices.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                        </svg>
+                        공지사항 관리
+                    </a>
+                    <a href="/admin-inquiries.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+                        </svg>
+                        문의 관리
+                    </a>
+                    <a href="/admin-users.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        사용자 관리
+                    </a>
+                    <a href="/admin-system.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        시스템 설정
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-2xl font-bold">사용자 관리</h2>
+                                <div class="flex space-x-2">
+                                    <select id="roleFilter" class="py-2 px-3 border border-gray-300 rounded-md text-sm">
+                                        <option value="all">모든 역할</option>
+                                        <option value="user">일반 사용자</option>
+                                        <option value="admin">관리자</option>
+                                    </select>
+                                    <select id="membershipFilter" class="py-2 px-3 border border-gray-300 rounded-md text-sm">
+                                        <option value="all">모든 회원 등급</option>
+                                        <option value="none">일반 회원</option>
+                                        <option value="pending">승인 대기</option>
+                                        <option value="active">VIP 회원</option>
+                                        <option value="expired">만료됨</option>
+                                    </select>
+                                    <button id="applyFiltersBtn" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                        필터 적용
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- 사용자 목록 테이블 -->
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">사용자</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">역할</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">회원 등급</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">등록일</th>
+                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">작업</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="usersList" class="bg-white divide-y divide-gray-200">
+                                        <tr>
+                                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">사용자 목록을 불러오는 중...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- 사용자 상세 정보 -->
+                            <div id="userDetailContainer" class="hidden mt-6 bg-gray-50 p-6 rounded-lg border border-gray-200">
+                                <h3 class="text-xl font-medium text-gray-900 mb-4">사용자 상세 정보</h3>
+                                <div id="userDetail"></div>
+                                
+                                <div id="membershipForm" class="mt-6">
+                                    <h4 class="text-lg font-medium text-gray-900 mb-2">멤버십 관리</h4>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                                            <select id="membershipStatus" class="w-full py-2 px-3 border border-gray-300 rounded-md">
+                                                <option value="none">일반회원</option>
+                                                <option value="pending">승인 대기</option>
+                                                <option value="active">VIP 회원</option>
+                                                <option value="expired">만료됨</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-1">멤버십 기간</label>
+                                            <select id="membershipDuration" class="w-full py-2 px-3 border border-gray-300 rounded-md">
+                                                <option value="1">1개월</option>
+                                                <option value="3">3개월</option>
+                                                <option value="6">6개월</option>
+                                                <option value="12">12개월</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <button id="saveMembershipBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">저장</button>
+                                        <button onclick="closeUserDetail()" class="ml-2 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">닫기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 토큰 체크 및 관리자 권한 확인
+        checkAdminAuth();
+        
+        function checkAdminAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // 관리자 권한 확인
+            fetch('/api/auth/check-admin', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success || !data.isAdmin) {
+                    alert('관리자 권한이 필요합니다.');
+                    window.location.href = '/dashboard.html';
+                }
+            })
+            .catch(err => {
+                console.error('관리자 권한 확인 오류:', err);
+                window.location.href = '/dashboard.html';
+            });
+        }
+        
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+        
+        // 사용자 목록 로드
+        async function loadUsers() {
+            try {
+                const token = localStorage.getItem('token');
+                const roleFilter = document.getElementById('roleFilter').value;
+                const membershipFilter = document.getElementById('membershipFilter').value;
+                
+                let url = '/admin/users';
+                const queryParams = [];
+                
+                if (roleFilter !== 'all') {
+                    queryParams.push(`role=${roleFilter}`);
+                }
+                
+                if (membershipFilter !== 'all') {
+                    queryParams.push(`membershipStatus=${membershipFilter}`);
+                }
+                
+                if (queryParams.length > 0) {
+                    url += `?${queryParams.join('&')}`;
+                }
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                const usersList = document.getElementById('usersList');
+                
+                if (data.success && data.users.length > 0) {
+                    usersList.innerHTML = '';
+                    
+                    data.users.forEach(user => {
+                        const tr = document.createElement('tr');
+                        
+                        const membershipBadge = getMembershipBadge(user.membershipStatus);
+                        const roleBadge = user.role === 'admin' ? 
+                            '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">관리자</span>' : 
+                            '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">사용자</span>';
+                        
+                        tr.innerHTML = `
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">${user.username}</div>
+                                        <div class="text-sm text-gray-500">${user.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                ${roleBadge}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                ${membershipBadge}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${new Date(user.createdAt).toLocaleDateString()}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="viewUser('${user._id}')" class="text-blue-600 hover:text-blue-900 mr-3">상세정보</button>
+                                <button onclick="deleteUser('${user._id}', '${user.username}')" class="text-red-600 hover:text-red-900">삭제</button>
+                            </td>
+                        `;
+                        
+                        usersList.appendChild(tr);
+                    });
+                } else {
+                    usersList.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">사용자가 없습니다</td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                console.error('사용자 목록 로드 오류:', error);
+                document.getElementById('usersList').innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-4 text-center text-sm text-red-500">사용자 목록을 불러오는 중 오류가 발생했습니다</td>
+                    </tr>
+                `;
+            }
+        }
+        
+        // 멤버십 뱃지 생성
+        function getMembershipBadge(status) {
+            switch (status) {
+                case 'active':
+                    return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">VIP 회원</span>';
+                case 'pending':
+                    return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">승인 대기</span>';
+                case 'expired':
+                    return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">만료됨</span>';
+                default:
+                    return '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">일반 회원</span>';
+            }
+        }
+        
+        // 사용자 상세 정보 보기
+        async function viewUser(userId) {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/admin/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success && result.user) {
+                    const user = result.user;
+                    
+                    // 상세 정보 표시
+                    const userDetail = document.getElementById('userDetail');
+                    
+                    // 회원 정보 설정
+                    document.getElementById('membershipStatus').value = user.membershipStatus || 'none';
+                    document.getElementById('membershipDuration').value = user.membershipDuration || '1';
+                    
+                    // 상세 정보 HTML 구성
+                    let membershipInfo = '';
+                    if (user.membershipStatus === 'active' || user.membershipStatus === 'expired') {
+                        const startDate = user.membershipStartDate ? new Date(user.membershipStartDate).toLocaleDateString() : '없음';
+                        const expiresDate = user.membershipExpires ? new Date(user.membershipExpires).toLocaleDateString() : '없음';
+                        
+                        membershipInfo = `
+                            <div class="mt-4">
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">멤버십 정보</h4>
+                                <p><span class="font-medium">시작일:</span> ${startDate}</p>
+                                <p><span class="font-medium">만료일:</span> ${expiresDate}</p>
+                                <p><span class="font-medium">기간:</span> ${user.membershipDuration}개월</p>
+                            </div>
+                        `;
+                    } else if (user.membershipStatus === 'pending') {
+                        const requestDate = user.vipRequestDate ? new Date(user.vipRequestDate).toLocaleDateString() : '없음';
+                        
+                        membershipInfo = `
+                            <div class="mt-4">
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">VIP 신청 정보</h4>
+                                <p><span class="font-medium">신청일:</span> ${requestDate}</p>
+                                <p><span class="font-medium">신청 메시지:</span> ${user.vipRequestMessage || '없음'}</p>
+                            </div>
+                        `;
+                    }
+                    
+                    userDetail.innerHTML = `
+                        <input type="hidden" id="currentUserId" value="${user._id}">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <p><span class="font-medium">아이디:</span> ${user.username}</p>
+                                <p><span class="font-medium">이메일:</span> ${user.email}</p>
+                                <p><span class="font-medium">역할:</span> ${user.role === 'admin' ? '관리자' : '일반 사용자'}</p>
+                                <p><span class="font-medium">가입일:</span> ${new Date(user.createdAt).toLocaleDateString()}</p>
+                            </div>
+                            <div>
+                                <p><span class="font-medium">회원 등급:</span> ${getMembershipText(user.membershipStatus)}</p>
+                                ${membershipInfo}
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 상세 정보 패널 표시
+                    document.getElementById('userDetailContainer').classList.remove('hidden');
+                    
+                    // 저장 버튼에 이벤트 리스너 등록
+                    document.getElementById('saveMembershipBtn').onclick = saveMembership;
+                } else {
+                    alert('사용자 정보를 가져오는 데 실패했습니다');
+                }
+            } catch (error) {
+                console.error('사용자 상세 정보 로드 오류:', error);
+                alert('사용자 정보를 가져오는 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 멤버십 상태 텍스트
+        function getMembershipText(status) {
+            switch (status) {
+                case 'active': return 'VIP 회원';
+                case 'pending': return '승인 대기';
+                case 'expired': return '만료됨';
+                default: return '일반 회원';
+            }
+        }
+        
+        // 상세 정보 닫기
+        function closeUserDetail() {
+            document.getElementById('userDetailContainer').classList.add('hidden');
+        }
+        
+        // 멤버십 정보 저장
+        async function saveMembership() {
+            try {
+                const token = localStorage.getItem('token');
+                const userId = document.getElementById('currentUserId').value;
+                const status = document.getElementById('membershipStatus').value;
+                const duration = document.getElementById('membershipDuration').value;
+                
+                // API 엔드포인트 수정
+                const response = await fetch(`/api/admin/users/${userId}/membership`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        status: status,
+                        duration: document.getElementById('membershipDuration').value,
+                        action: status === 'active' ? 'approve' : 'cancel'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('멤버십 정보가 업데이트되었습니다');
+                    closeUserDetail();
+                    loadUsers();
+                } else {
+                    alert(result.message || '멤버십 정보 업데이트에 실패했습니다');
+                }
+            } catch (error) {
+                console.error('멤버십 정보 저장 오류:', error);
+                alert('멤버십 정보를 저장하는 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 사용자 삭제
+        async function deleteUser(userId, username) {
+            if (!confirm(`사용자 '${username}'를 삭제하시겠습니까?`)) {
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch(`/admin/users/${userId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('사용자가 삭제되었습니다');
+                    loadUsers();
+                } else {
+                    alert(result.message || '사용자 삭제에 실패했습니다');
+                }
+            } catch (error) {
+                console.error('사용자 삭제 오류:', error);
+                alert('사용자를 삭제하는 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 이벤트 리스너 등록
+        document.addEventListener('DOMContentLoaded', function() {
+            // 사용자 목록 로드
+            loadUsers();
+            
+            // 필터 적용 버튼
+            document.getElementById('applyFiltersBtn').addEventListener('click', loadUsers);
+        });
+    </script>
+</body>
+</html>

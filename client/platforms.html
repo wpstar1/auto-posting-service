@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>워드프레스 계정 관리 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        @media (max-width: 768px) {
+            .flex-layout {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            .sidebar nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .sidebar nav a {
+                width: auto;
+                margin: 5px;
+            }
+            .content-area {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="remainingPosts" class="mr-4 text-sm text-gray-600">오늘 남은 포스팅: -</span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex flex-col md:flex-row">
+            <!-- 사이드바: 데스크탑에서는 좌측, 모바일에서는 상단에 표시 -->
+            <div class="w-full md:w-64 bg-white shadow-lg md:h-screen overflow-y-auto">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/auto-post.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        자동 포스팅
+                    </a>
+                    <a href="/platforms.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        계정 관리
+                    </a>
+                    <div class="border-t border-gray-200 my-4"></div>
+                    <a href="/support.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        고객센터
+                    </a>
+                    <div id="adminMenu" class="hidden">
+                        <div class="border-t border-gray-200 my-4"></div>
+                        <a href="/admin.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                            <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            관리자 메뉴
+                        </a>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-6 sm:p-10 content-area">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h1 class="text-2xl font-semibold text-gray-900">워드프레스 계정 관리</h1>
+                                <button id="addAccountBtn" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                    계정 추가
+                                </button>
+                            </div>
+
+                            <!-- 계정 목록 -->
+                            <div id="accountList" class="grid grid-cols-1 gap-4">
+                                <!-- 계정 카드들이 여기에 동적으로 추가됩니다 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 계정 추가/수정 모달 -->
+        <div id="accountModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden">
+            <div class="flex items-center justify-center min-h-screen">
+                <div class="bg-white rounded-lg p-8 max-w-md w-full">
+                    <h2 id="modalTitle" class="text-lg font-medium mb-4">계정 추가</h2>
+                    <form id="accountForm">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">계정 이름 (아무거나)</label>
+                                <input type="text" id="accountName" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">워드프레스 사이트 URL</label>
+                                <input type="url" id="siteUrl" required placeholder="https://example.com" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">User ID (워드프레스 아이디)</label>
+                                <input type="text" id="username" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Application Password</label>
+                                <input type="password" id="appPassword" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <p class="mt-1 text-xs text-gray-500">※ 워드프레스 관리자 > 프로필 > 애플리케이션 비밀번호에서 생성</p>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" id="cancelBtn" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                                취소
+                            </button>
+                            <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                                저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEditId = null;
+        
+        // 토큰 체크
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+        
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('accountModal').classList.add('hidden');
+        }
+
+        // 계정 추가/수정 폼 제출
+        document.getElementById('accountForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const accountName = document.getElementById('accountName').value;
+            const siteUrl = document.getElementById('siteUrl').value;
+            const username = document.getElementById('username').value;
+            const appPassword = document.getElementById('appPassword').value;
+            
+            const accountData = {
+                name: accountName,
+                url: siteUrl,
+                username: username,
+                password: appPassword
+            };
+            
+            try {
+                // 수정 모드
+                if (currentEditId) {
+                    const response = await fetch(`/api/platforms/${currentEditId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(accountData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert('계정이 성공적으로 수정되었습니다.');
+                        closeModal();
+                        loadAccounts();
+                    } else {
+                        alert(result.message || '계정 수정에 실패했습니다.');
+                    }
+                } 
+                // 추가 모드
+                else {
+                    const response = await fetch('/api/platforms', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(accountData)
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert('계정이 성공적으로 추가되었습니다.');
+                        closeModal();
+                        loadAccounts();
+                    } else {
+                        alert(result.message || '계정 추가에 실패했습니다.');
+                    }
+                }
+            } catch (error) {
+                console.error('계정 저장 오류:', error);
+                alert('계정 저장 중 오류가 발생했습니다.');
+            }
+        });
+        
+        // 계정 목록 로드
+        async function loadAccounts() {
+            try {
+                const response = await fetch('/api/platforms', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                const accountList = document.getElementById('accountList');
+                accountList.innerHTML = '';
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    result.data.forEach(account => {
+                        const accountCard = document.createElement('div');
+                        accountCard.className = 'bg-white rounded-lg border border-gray-200 p-4 relative';
+                        
+                        // 툴팁 설명 추가
+                        accountCard.setAttribute('data-tooltip', '클릭하여 계정을 수정하거나 오른쪽의 삭제 버튼을 클릭하여 삭제');
+                        accountCard.className += ' tooltip-container';
+                        
+                        accountCard.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <div class="cursor-pointer" onclick="editAccount('${account._id}')">
+                                    <h3 class="text-lg font-medium text-gray-900">${account.name}</h3>
+                                    <p class="text-sm text-gray-500 mt-1">${account.url}</p>
+                                    <p class="text-sm text-gray-500">사용자: ${account.username}</p>
+                                </div>
+                                <button onclick="deleteAccount('${account._id}')" class="text-red-600 hover:text-red-900">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                        
+                        accountList.appendChild(accountCard);
+                    });
+                } else {
+                    accountList.innerHTML = `
+                        <div class="text-center py-4 text-gray-500">
+                            등록된 계정이 없습니다. '계정 추가' 버튼을 클릭하여 계정을 추가해주세요.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('계정 목록 로드 오류:', error);
+                document.getElementById('accountList').innerHTML = `
+                    <div class="text-center py-4 text-red-500">
+                        계정 목록을 불러오는 중 오류가 발생했습니다.
+                    </div>
+                `;
+            }
+        }
+        
+        // 계정 수정
+        async function editAccount(id) {
+            try {
+                const response = await fetch(`/api/platforms/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    const account = result.data;
+                    
+                    // 모달 설정
+                    document.getElementById('modalTitle').textContent = '계정 수정';
+                    document.getElementById('accountName').value = account.name;
+                    document.getElementById('siteUrl').value = account.url;
+                    document.getElementById('username').value = account.username;
+                    document.getElementById('appPassword').value = '';  // 보안상 비밀번호는 표시하지 않음
+                    
+                    currentEditId = id;
+                    document.getElementById('accountModal').classList.remove('hidden');
+                } else {
+                    alert(result.message || '계정 정보를 불러올 수 없습니다.');
+                }
+            } catch (error) {
+                console.error('계정 정보 로드 오류:', error);
+                alert('계정 정보를 불러오는 중 오류가 발생했습니다.');
+            }
+        }
+        
+        // 계정 삭제
+        async function deleteAccount(id) {
+            if (!confirm('정말로 이 계정을 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/platforms/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('계정이 성공적으로 삭제되었습니다.');
+                    loadAccounts();
+                } else {
+                    alert(result.message || '계정 삭제에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error('계정 삭제 오류:', error);
+                alert('계정 삭제 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 초기 계정 목록 로드
+        loadAccounts();
+        
+        // 계정 추가 버튼 클릭
+        document.getElementById('addAccountBtn').addEventListener('click', () => {
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = '계정 추가';
+            document.getElementById('accountForm').reset();
+            document.getElementById('accountModal').classList.remove('hidden');
+        });
+        
+        // 모달 취소 버튼
+        document.getElementById('cancelBtn').addEventListener('click', closeModal);
+        
+        // 사용자 권한 확인 및 관리자 메뉴 표시
+        fetch('/api/auth/check-admin', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.isAdmin) {
+                document.getElementById('adminMenu').classList.remove('hidden');
+            }
+        })
+        .catch(err => {
+            console.error('권한 확인 오류:', err);
+        });
+        
+        // 툴팁 기능 개선
+        function setupTooltips() {
+            document.querySelectorAll('.tooltip-container').forEach(el => {
+                el.addEventListener('mouseenter', function() {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'absolute bg-gray-800 text-white text-xs rounded py-1 px-2 -mt-16 left-0 right-0 mx-auto w-max max-w-xs z-10';
+                    tooltip.textContent = this.getAttribute('data-tooltip');
+                    tooltip.style.transform = 'translateY(-100%)';
+                    this.appendChild(tooltip);
+                });
+                
+                el.addEventListener('mouseleave', function() {
+                    const tooltip = this.querySelector('.bg-gray-800');
+                    if (tooltip) {
+                        tooltip.remove();
+                    }
+                });
+            });
+        }
+        
+        // 계정 목록 로드 후 툴팁 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 툴팁 설정
+            setupTooltips();
+            
+            // 남은 포스팅 정보 로드
+            fetch('/api/users/limits', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('remainingPosts').textContent = `오늘 남은 포스팅: ${data.data.remaining}/${data.data.limit}`;
+                }
+            })
+            .catch(err => {
+                console.error('사용 제한 로드 오류:', err);
+            });
+        });
+    </script>
+</body>
+</html>

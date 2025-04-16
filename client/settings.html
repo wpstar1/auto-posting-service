@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>설정 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <!-- 네비게이션 바 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="userLevel" class="mr-4 text-sm text-gray-600"></span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- 프로필 섹션 -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">프로필 설정</h2>
+                </div>
+                <div class="p-6">
+                    <form id="profileForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">이메일</label>
+                            <input type="email" id="email" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" readonly>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">사용자명</label>
+                            <input type="text" id="username" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <div>
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                프로필 저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 비밀번호 변경 섹션 -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">비밀번호 변경</h2>
+                </div>
+                <div class="p-6">
+                    <form id="passwordForm" class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">현재 비밀번호</label>
+                            <input type="password" id="currentPassword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">새 비밀번호</label>
+                            <input type="password" id="newPassword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">새 비밀번호 확인</label>
+                            <input type="password" id="confirmPassword" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm" required>
+                        </div>
+                        <div>
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                비밀번호 변경
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 알림 설정 섹션 -->
+            <div class="bg-white shadow rounded-lg mb-6">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">알림 설정</h2>
+                </div>
+                <div class="p-6">
+                    <form id="notificationForm" class="space-y-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="emailNotification" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="emailNotification" class="ml-2 block text-sm text-gray-900">
+                                        이메일 알림
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="postSuccess" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="postSuccess" class="ml-2 block text-sm text-gray-900">
+                                        포스팅 성공 알림
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <input type="checkbox" id="postError" class="h-4 w-4 text-blue-600 border-gray-300 rounded">
+                                    <label for="postError" class="ml-2 block text-sm text-gray-900">
+                                        포스팅 실패 알림
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                                알림 설정 저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 회원 등급 섹션 -->
+            <div class="bg-white shadow rounded-lg">
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h2 class="text-lg font-medium text-gray-900">회원 등급</h2>
+                </div>
+                <div class="p-6">
+                    <div id="membershipInfo">
+                        <!-- 회원 등급 정보가 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 토큰 체크
+        const token = localStorage.getItem('token');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // 사용자 정보 로드
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    const isVip = data.user.level === 'vip';
+                    document.getElementById('userLevel').textContent = isVip ? 'VIP 회원' : 'Level 1';
+                    document.getElementById('email').value = data.user.email;
+                    document.getElementById('username').value = data.user.username;
+
+                    // 회원 등급 정보 표시
+                    const membershipInfo = document.getElementById('membershipInfo');
+                    if (isVip) {
+                        membershipInfo.innerHTML = `
+                            <div class="bg-green-50 p-4 rounded-md">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-green-800">VIP 회원</h3>
+                                        <div class="mt-2 text-sm text-green-700">
+                                            <ul class="list-disc pl-5 space-y-1">
+                                                <li>무제한 포스팅</li>
+                                                <li>예약 포스팅</li>
+                                                <li>다중 계정 관리</li>
+                                                <li>고급 설정</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        membershipInfo.innerHTML = `
+                            <div class="bg-yellow-50 p-4 rounded-md">
+                                <div class="flex">
+                                    <div class="flex-shrink-0">
+                                        <svg class="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-yellow-800">Level 1 회원</h3>
+                                        <div class="mt-2 text-sm text-yellow-700">
+                                            <p>현재 제한된 기능만 사용할 수 있습니다:</p>
+                                            <ul class="list-disc pl-5 space-y-1 mt-2">
+                                                <li>하루 3회 포스팅</li>
+                                                <li>1개의 워드프레스 계정</li>
+                                                <li>즉시 포스팅만 가능</li>
+                                            </ul>
+                                            <a href="#" class="block mt-4 text-sm font-medium text-yellow-800 hover:text-yellow-900">
+                                                VIP로 업그레이드하기 →
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // 알림 설정 로드
+                    loadNotificationSettings();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 알림 설정 로드
+        async function loadNotificationSettings() {
+            try {
+                const response = await fetch('http://localhost:5000/api/settings/notifications', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('emailNotification').checked = data.settings.emailNotification;
+                    document.getElementById('postSuccess').checked = data.settings.postSuccess;
+                    document.getElementById('postError').checked = data.settings.postError;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // 프로필 수정
+        document.getElementById('profileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/profile', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('프로필이 수정되었습니다.');
+                } else {
+                    alert(data.error || '프로필 수정 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('프로필 수정 중 오류가 발생했습니다.');
+            }
+        });
+
+        // 비밀번호 변경
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword !== confirmPassword) {
+                alert('새 비밀번호가 일치하지 않습니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/password', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        currentPassword: document.getElementById('currentPassword').value,
+                        newPassword: newPassword
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('비밀번호가 변경되었습니다.');
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    alert(data.error || '비밀번호 변경 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('비밀번호 변경 중 오류가 발생했습니다.');
+            }
+        });
+
+        // 알림 설정 저장
+        document.getElementById('notificationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/settings/notifications', {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        emailNotification: document.getElementById('emailNotification').checked,
+                        postSuccess: document.getElementById('postSuccess').checked,
+                        postError: document.getElementById('postError').checked
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    alert('알림 설정이 저장되었습니다.');
+                } else {
+                    alert(data.error || '알림 설정 저장 중 오류가 발생했습니다.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('알림 설정 저장 중 오류가 발생했습니다.');
+            }
+        });
+
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+
+        // 초기화
+        loadUserInfo();
+    </script>
+</body>
+</html>

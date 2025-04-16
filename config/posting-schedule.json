@@ -1,0 +1,46 @@
+{
+  "enabled": true,
+  "timeSchedule": [
+    {
+      "cron": "0 */1 * * *",
+      "enabled": true,
+      "description": "매 시간마다 실행"
+    }
+  ],
+  "keywordGroups": [
+    {
+      "name": "일반 주제",
+      "enabled": true,
+      "keywords": [
+        "여행",
+        "맛집",
+        "건강",
+        "패션",
+        "취미"
+      ],
+      "used": []
+    },
+    {
+      "name": "기술 주제",
+      "enabled": true,
+      "keywords": [
+        "인공지능",
+        "빅데이터",
+        "클라우드",
+        "블록체인",
+        "사물인터넷"
+      ],
+      "used": []
+    }
+  ],
+  "limits": {
+    "postsPerDay": 5,
+    "minIntervalMinutes": 60,
+    "aiImagePerDay": 10
+  },
+  "usage": {
+    "postsToday": 0,
+    "aiImagesGenerated": 0,
+    "lastResetDate": "2025-04-12"
+  }
+}

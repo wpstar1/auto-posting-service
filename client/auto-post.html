@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자동 포스팅 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* 모바일 최적화 스타일 */
+        @media (max-width: 768px) {
+            .mobile-full {
+                width: 100% !important;
+            }
+            .mobile-p-2 {
+                padding: 0.5rem !important;
+            }
+            .mobile-overflow-hidden {
+                overflow-x: hidden !important;
+            }
+            .mobile-text-sm {
+                font-size: 0.875rem !important;
+            }
+            .mobile-grid-1 {
+                grid-template-columns: 1fr !important;
+            }
+            .mobile-hidden {
+                display: none !important;
+            }
+            .mobile-block {
+                display: block !important;
+            }
+            .mobile-flex-col {
+                flex-direction: column !important;
+            }
+            .mobile-mt-2 {
+                margin-top: 0.5rem !important;
+            }
+            .mobile-mb-2 {
+                margin-bottom: 0.5rem !important;
+            }
+            .mobile-mx-0 {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+        }
+        
+        /* 툴팁 스타일 개선 */
+        .tooltip-text {
+            min-width: 16rem;
+            max-width: 20rem;
+            word-break: keep-all;
+            word-wrap: break-word;
+            white-space: normal;
+            overflow: visible;
+            line-height: 1.4;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            margin-top: -8px;
+            margin-bottom: 8px !important;
+            bottom: 100% !important;
+            padding: 8px 12px !important;
+        }
+        
+        .tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        @media (max-width: 768px) {
+            .tooltip-text {
+                min-width: 14rem;
+                left: 0;
+                transform: none;
+                margin-left: -7rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 mobile-overflow-hidden">
+    <div class="min-h-screen">
+        <!-- 네비게이션 바 -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="remainingPosts" class="mr-4 text-sm text-gray-600 mobile-hidden">오늘 남은 포스팅: -</span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex flex-col md:flex-row">
+            <!-- 사이드바: 데스크탑에서는 좌측, 모바일에서는 상단에 표시 -->
+            <div class="w-full md:w-64 bg-white shadow-lg md:h-screen overflow-y-auto">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/auto-post.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        자동 포스팅
+                    </a>
+                    <a href="/platforms.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        계정 관리
+                    </a>
+                    <div class="border-t border-gray-200 my-4"></div>
+                    <a href="/support.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        고객센터
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10 mobile-p-2">
+                <div class="max-w-4xl mx-auto mobile-mx-0">
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-6 mobile-p-2">
+                            <h2 class="text-2xl font-bold mb-6 mobile-text-sm mobile-mb-2">자동 포스팅 설정</h2>
+                            
+                            <!-- 모바일 메뉴 (모바일에서만 표시) -->
+                            <div class="hidden mobile-block mb-4">
+                                <select id="mobileNavigation" class="w-full p-2 border border-gray-300 rounded shadow-sm" onchange="navigateTo(this.value)">
+                                    <option value="" selected disabled>메뉴 선택</option>
+                                    <option value="/dashboard.html">대시보드</option>
+                                    <option value="/auto-post.html">자동 포스팅</option>
+                                    <option value="/platforms.html">계정 관리</option>
+                                    <option value="/support.html">고객센터</option>
+                                </select>
+                            </div>
+                            
+                            <form id="autoPostForm" class="space-y-6 mobile-text-sm">
+                                <!-- 워드프레스 계정 선택 -->
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">워드프레스 계정</label>
+                                    <select id="wordpressAccount" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                        <option value="">계정을 선택하세요</option>
+                                    </select>
+                                </div>
+
+                                <!-- 콘텐츠 스타일 -->
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">콘텐츠 스타일</h3>
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <div class="flex items-center">
+                                            <input type="radio" id="professional_guide" name="contentStyle" value="professional_guide" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300" checked>
+                                            <label for="professional_guide" class="ml-2 block">
+                                                <span class="text-sm font-medium text-gray-900">전문가 가이드 스타일</span>
+                                                <p class="text-sm text-gray-500">전문적이고 신뢰도 높은 정보 전달 중심의 글쓰기</p>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio" id="story_experience" name="contentStyle" value="story_experience" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                            <label for="story_experience" class="ml-2 block">
+                                                <span class="text-sm font-medium text-gray-900">경험 공유 스타일</span>
+                                                <p class="text-sm text-gray-500">실제 경험과 사례를 바탕으로 한 스토리텔링</p>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio" id="qa_format" name="contentStyle" value="qa_format" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                            <label for="qa_format" class="ml-2 block">
+                                                <span class="text-sm font-medium text-gray-900">Q&A 중심 스타일</span>
+                                                <p class="text-sm text-gray-500">자주 묻는 질문과 답변 형식으로 구성</p>
+                                            </label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="radio" id="random_style" name="contentStyle" value="random" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
+                                            <label for="random_style" class="ml-2 block">
+                                                <span class="text-sm font-medium text-gray-900">랜덤 스타일</span>
+                                                <p class="text-sm text-gray-500">여러 스타일을 랜덤하게 선택하여 다양성 유지</p>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 포스팅 설정 -->
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900">포스팅 설정</h3>
+                                    <div class="mt-4 space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">주제 키워드</label>
+                                            <input type="text" id="keywords" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="예: 디지털마케팅, SNS전략, 온라인광고">
+                                            <p class="mt-1 text-sm text-gray-500">여러 키워드는 쉼표로 구분해주세요</p>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">포스팅 주기
+                                                <span class="tooltip-container">
+                                                    <span class="text-blue-500 hover:text-blue-700" id="postingFreqHelp">?</span>
+                                                    <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
+                                                        랜덤 포스팅은 검색엔진 랭킹 향상에 가장 효과적입니다. 자연스러운 패턴으로 포스팅하여 검색 알고리즘에 더 잘 노출됩니다.
+                                                    </div>
+                                                </span>
+                                            </label>
+                                            <select id="postingFrequency" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="immediate" selected>즉시 포스팅 (1회)</option>
+                                                <option value="random" class="vip-only">랜덤 (VIP 전용)</option>
+                                                <option value="1" class="vip-only">1시간마다</option>
+                                                <option value="2" class="vip-only">2시간마다</option>
+                                                <option value="3" class="vip-only">3시간마다</option>
+                                                <option value="4" class="vip-only">4시간마다</option>
+                                                <option value="5" class="vip-only">5시간마다</option>
+                                                <option value="6" class="vip-only">6시간마다</option>
+                                                <option value="7" class="vip-only">7시간마다</option>
+                                                <option value="8" class="vip-only">8시간마다</option>
+                                                <option value="9" class="vip-only">9시간마다</option>
+                                                <option value="10" class="vip-only">10시간마다</option>
+                                                <option value="11" class="vip-only">11시간마다</option>
+                                                <option value="12" class="vip-only">12시간마다</option>
+                                                <option value="13" class="vip-only">13시간마다</option>
+                                                <option value="14" class="vip-only">14시간마다</option>
+                                                <option value="15" class="vip-only">15시간마다</option>
+                                                <option value="16" class="vip-only">16시간마다</option>
+                                                <option value="17" class="vip-only">17시간마다</option>
+                                                <option value="18" class="vip-only">18시간마다</option>
+                                                <option value="19" class="vip-only">19시간마다</option>
+                                                <option value="20" class="vip-only">20시간마다</option>
+                                                <option value="21" class="vip-only">21시간마다</option>
+                                                <option value="22" class="vip-only">22시간마다</option>
+                                                <option value="23" class="vip-only">23시간마다</option>
+                                                <option value="24" class="vip-only">24시간마다</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">키워드 밀도(%)
+                                                <span class="tooltip-container">
+                                                    <span class="text-blue-500 hover:text-blue-700" id="keywordDensityHelp">?</span>
+                                                    <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
+                                                        1.5% – 조금 더 자연스럽고 과도한 반복 피할 때 좋음.<br>
+                                                        2% – 자연스럽고 SEO에 가장 이상적. (과하지도, 부족하지도 않음)
+                                                    </div>
+                                                </span>
+                                            </label>
+                                            <select id="keywordDensity" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="1.5">1.5%</option>
+                                                <option value="2" selected>2%</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">포스트 최소 길이
+                                                <span class="tooltip-container">
+                                                    <span class="text-blue-500 hover:text-blue-700" id="minWordCountHelp">?</span>
+                                                    <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
+                                                        <strong>SEO에 좋은 워드프레스 포스트 길이 3가지 추천</strong><br>
+                                                        500~800자 – 기본 SEO 통과선.<br>
+                                                        1000~2000자 – 검색엔진이 좋아함. 상위 노출 확률 ↑<br>
+                                                        3,000자 이상 – 심층 콘텐츠, 경쟁 키워드에 효과적.<br><br>
+                                                        하지만 너무 반복되는 글자갯수는 좋지못합니다. 랜덤을 선택하세요.
+                                                    </div>
+                                                </span>
+                                            </label>
+                                            <select id="minWordCount" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="300">300단어</option>
+                                                <option value="800" class="vip-only">500~800단어 (VIP 전용)</option>
+                                                <option value="2000" class="vip-only">1,000~2,000단어 (VIP 전용)</option>
+                                                <option value="3000" class="vip-only">3,000단어 이상 (VIP 전용)</option>
+                                                <option value="random" class="vip-only">랜덤 (VIP 전용)</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">포스팅당 이미지 수
+                                                <span class="tooltip-container">
+                                                    <span class="text-blue-500 hover:text-blue-700" id="imageCountHelp">?</span>
+                                                    <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
+                                                        이미지를 추가하시면 AI 이미지와 랜덤으로 업로드 됩니다. 이미지를 1~5개 추가하신 후 랜덤으로 진행하시면 SEO에 좋습니다.
+                                                    </div>
+                                                </span>
+                                            </label>
+                                            <select id="imageCount" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="0">이미지 사용 안함</option>
+                                                <option value="1" selected>1개</option>
+                                                <option value="2" class="vip-only">2개 (VIP 전용)</option>
+                                                <option value="3" class="vip-only">3개 (VIP 전용)</option>
+                                                <option value="random" class="vip-only">1~3개 랜덤 (VIP 전용)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 내부 링크 설정 -->
+                                <div>
+                                    <div class="flex items-center">
+                                        <input type="checkbox" id="useInternalLinks" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                                        <label for="useInternalLinks" class="ml-2 block text-sm text-gray-900">내부 링크 자동 추가</label>
+                                    </div>
+                                    <div id="internalLinksSection" class="mt-4 hidden">
+                                        <div class="space-y-2" id="internalLinksList">
+                                            <!-- 내부 링크 입력 필드들이 여기에 동적으로 추가됩니다 -->
+                                        </div>
+                                        <button type="button" onclick="addInternalLinkField()" class="mt-2 inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200">
+                                            + 링크 추가
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 이미지 설정 -->
+                                <div>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-4">이미지 설정</h3>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700">포스팅당 이미지 수</label>
+                                            <select id="imageCount" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="0">이미지 사용 안함</option>
+                                                <option value="1" selected>1개</option>
+                                                <option value="2" class="vip-only">2개 (VIP 전용)</option>
+                                                <option value="3" class="vip-only">3개 (VIP 전용)</option>
+                                                <option value="random" class="vip-only">1~3개 랜덤 (VIP 전용)</option>
+                                            </select>
+                                        </div>
+                                        <div class="mt-2">
+                                            <label class="block text-sm font-medium text-gray-700">이미지 직접 추가
+                                                <span id="imageUploadVipHelp" class="ml-1 text-xs text-red-500 hidden">(VIP 전용 기능)</span>
+                                            </label>
+                                            <div class="mt-1 flex items-center">
+                                                <label class="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none">
+                                                    <span id="imageUploadBtn">파일 선택</span>
+                                                    <input type="file" id="imageUpload" multiple accept="image/*" class="sr-only" />
+                                                </label>
+                                                <p class="ml-3 text-sm text-gray-500">이미지는 최대 5개까지 업로드 가능합니다.</p>
+                                            </div>
+                                            <div class="mt-2 grid grid-cols-5 gap-2" id="imagePreviews">
+                                                <!-- 업로드된 이미지 미리보기가 여기에 표시됩니다 -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 저장 버튼 -->
+                                <div class="flex justify-end space-x-4">
+                                    <button type="button" onclick="saveSettings()" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        설정 저장
+                                    </button>
+                                    <button type="submit" id="startButton" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                        자동 포스팅 시작
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // 이미지 저장 배열
+            let uploadedImages = [];
+            let internalLinks = [];
+
+            // 현재 사용자 레벨 확인 (로컬스토리지에서 가져오기)
+            function getUserLevel() {
+                // 토큰이 없으면 기본값 'level1' 반환
+                if (!localStorage.getItem('token')) return 'level1';
+                
+                try {
+                    // 사용자 정보가 있으면 그 정보에서 레벨과 멤버십 상태 함께 확인
+                    const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
+                    // VIP 레벨이고 멤버십 상태가 active인 경우에만 VIP로 인정
+                    return (userInfo.level === 'vip' && userInfo.membershipStatus === 'active') ? 'vip' : 'level1';
+                } catch (e) {
+                    console.error('사용자 정보 파싱 오류:', e);
+                    return 'level1'; // 오류 발생 시 기본값
+                }
+            }
+            
+            // VIP 전용 기능 알림
+            function showVipAlert(feature) {
+                alert(`'${feature}' 기능은 VIP 회원 전용입니다.\n업그레이드하시면 더 많은 기능을 이용하실 수 있습니다.`);
+            }
+            
+            // 사용자 정보 최신화
+            async function updateUserInfo() {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        console.error('로그인이 필요합니다');
+                        return;
+                    }
+
+                    const response = await fetch('/api/auth/me', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('사용자 정보를 불러오는데 실패했습니다');
+                    }
+
+                    const result = await response.json();
+
+                    if (!result.success) {
+                        throw new Error(result.message || '사용자 정보를 불러오는데 실패했습니다');
+                    }
+
+                    // API 응답의 user 필드를 로컬 스토리지에 저장
+                    if (result.user) {
+                        localStorage.setItem('userInfo', JSON.stringify(result.user));
+                    }
+                } catch (error) {
+                    console.error('사용자 정보 최신화 실패:', error);
+                }
+            }
+
+            // 사용자 레벨에 따른 UI 초기화 
+            async function initUIByUserLevel() {
+                const userLevel = await getUserLevel();
+                console.log('현재 사용자 레벨:', userLevel);
+                
+                // VIP 전용 기능 처리
+                const vipOnlyElements = document.querySelectorAll('.vip-only');
+                const freeOnlyElements = document.querySelectorAll('.free-only');
+                
+                if (userLevel === 1 || userLevel === 'level1') { 
+                    // 이미지 업로드 VIP 전용 안내 표시
+                    document.getElementById('imageUploadVipHelp').classList.remove('hidden');
+                    
+                    // 이미지 업로드 버튼 클릭 시 VIP 알림
+                    document.getElementById('imageUploadBtn').addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        showVipAlert('이미지 직접 업로드');
+                        return false;
+                    });
+                    
+                    // VIP 전용 옵션들을 비활성화하고, 선택 시도 시 알림 표시
+                    vipOnlyElements.forEach(element => {
+                        if (element.tagName === 'OPTION') {
+                            element.disabled = false; // 모든 옵션 선택 가능하게 설정
+                        }
+                    });
+                    
+                    // 포스팅당 이미지 수 제한
+                    const imageCountSelect = document.getElementById('imageCount');
+                    imageCountSelect.addEventListener('change', function(e) {
+                        const selectedOption = imageCountSelect.options[imageCountSelect.selectedIndex];
+                        // 1개 초과 이미지 선택 시 VIP 알림 표시
+                        if (selectedOption.value !== '0' && selectedOption.value !== '1') {
+                            e.preventDefault();
+                            showVipAlert('1개 이상 이미지 추가');
+                            imageCountSelect.value = '1'; // 1개로 되돌림
+                        }
+                    });
+                    
+                    // 포스트 최소 길이 선택 제한
+                    const minWordCountSelect = document.getElementById('minWordCount');
+                    minWordCountSelect.addEventListener('change', function(e) {
+                        const selectedOption = minWordCountSelect.options[minWordCountSelect.selectedIndex];
+                        if (selectedOption.classList.contains('vip-only')) {
+                            e.preventDefault();
+                            showVipAlert('고급 포스트 길이 설정');
+                            minWordCountSelect.value = '300'; // 기본값으로 되돌림
+                        }
+                    });
+                    
+                    // 포스팅 주기 VIP 기능 클릭 처리
+                    const postingFrequency = document.getElementById('postingFrequency');
+                    postingFrequency.addEventListener('change', function(e) {
+                        const selectedOption = postingFrequency.options[postingFrequency.selectedIndex];
+                        // 즉시 포스팅이 아닌 모든 옵션에 대해 VIP 알림
+                        if (selectedOption.value !== 'immediate') {
+                            e.preventDefault();
+                            showVipAlert('고급 포스팅 주기 설정');
+                            postingFrequency.value = 'immediate'; // 즉시 포스팅으로 되돌림
+                        }
+                    });
+                } else { 
+                    // VIP 사용자 처리 - 모든 기능 활성화
+                    document.getElementById('imageUploadVipHelp').classList.add('hidden');
+                    
+                    // 이미지 업로드 정상 작동
+                    const imageUpload = document.getElementById('imageUpload');
+                    imageUpload.classList.remove('sr-only');
+                    
+                    // VIP 전용 옵션 정상 활성화
+                    vipOnlyElements.forEach(element => {
+                        if (element.tagName === 'OPTION') {
+                            element.disabled = false;
+                        } else {
+                            element.classList.remove('opacity-50', 'cursor-not-allowed');
+                            if (element.tagName === 'INPUT') {
+                                element.disabled = false;
+                            }
+                        }
+                    });
+                }
+                
+                // 이벤트 리스너 등록
+                document.querySelectorAll('.vip-feature').forEach(element => {
+                    element.addEventListener('click', function(e) {
+                        if (userLevel === 1 || userLevel === 'level1') {
+                            e.preventDefault();
+                            showVipAlert(element.dataset.feature || '이 기능');
+                        }
+                    });
+                });
+            }
+            
+            // 로그아웃 함수
+            function logout() {
+                // 로컬 스토리지에서 인증 관련 항목 제거
+                localStorage.removeItem('token');
+                localStorage.removeItem('userInfo');
+                
+                // 로그인 페이지로 리디렉션
+                window.location.href = '/login.html';
+            }
+
+            // 페이지 로드 시 설정 불러오기
+            async function loadSettings() {
+                try {
+                    const response = await fetch('/api/auto-post/settings');
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        // 설정 적용
+                        document.getElementById('wordpressAccount').value = data.settings.platformId || '';
+                        document.getElementById('postingFrequency').value = data.settings.postingFrequency || '24';
+                        document.getElementById('keywordDensity').value = data.settings.keywordDensity || '3';
+                        document.getElementById('useInternalLinks').checked = data.settings.useInternalLinks || false;
+                        
+                        // 내부 링크 복원
+                        if (data.settings.internalLinks) {
+                            internalLinks = data.settings.internalLinks;
+                            updateInternalLinksList();
+                        }
+                        
+                        // 이미지 복원
+                        if (data.settings.images) {
+                            uploadedImages = data.settings.images;
+                            updateImagePreviews();
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+
+            // 워드프레스 계정 목록 로드
+            async function loadWordpressAccounts() {
+                try {
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        console.error('로그인이 필요합니다');
+                        return;
+                    }
+
+                    const response = await fetch('/api/platforms', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('계정 목록을 불러오는데 실패했습니다');
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (!result.success) {
+                        throw new Error(result.message || '계정 목록을 불러오는데 실패했습니다');
+                    }
+                    
+                    const select = document.getElementById('wordpressAccount');
+                    select.innerHTML = '<option value="">계정을 선택하세요</option>';
+                    
+                    // 계정 목록 데이터 구조 확인 및 수정
+                    const platforms = result.data || result.platforms || [];
+                    
+                    if (platforms.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = "";
+                        option.textContent = "등록된 계정이 없습니다";
+                        option.disabled = true;
+                        select.appendChild(option);
+                        
+                        // 계정 등록 페이지 링크 추가
+                        const registerOption = document.createElement('option');
+                        registerOption.value = "register";
+                        registerOption.textContent = "➕ 계정 등록하러 가기";
+                        select.appendChild(registerOption);
+                        
+                        select.addEventListener('change', function(e) {
+                            if (e.target.value === 'register') {
+                                window.location.href = '/platforms.html';
+                            }
+                        });
+                        
+                        console.log('등록된 계정이 없습니다');
+                        return;
+                    }
+                    
+                    platforms.forEach(account => {
+                        const option = document.createElement('option');
+                        option.value = account._id;
+                        option.textContent = account.name + ' (' + account.url + ')';
+                        select.appendChild(option);
+                    });
+                    
+                    console.log('계정 목록을 성공적으로 로드했습니다:', platforms.length + '개');
+                } catch (error) {
+                    console.error('계정 목록 로드 실패:', error);
+                    const select = document.getElementById('wordpressAccount');
+                    select.innerHTML = '<option value="">계정 로드 실패</option>';
+                    
+                    // 오류 발생시에도 계정 등록 옵션 제공
+                    const registerOption = document.createElement('option');
+                    registerOption.value = "register";
+                    registerOption.textContent = "➕ 계정 등록하러 가기";
+                    select.appendChild(registerOption);
+                    
+                    select.addEventListener('change', function(e) {
+                        if (e.target.value === 'register') {
+                            window.location.href = '/platforms.html';
+                        }
+                    });
+                }
+            }
+
+            // 내부 링크 필드 추가
+            function addInternalLinkField() {
+                const link = { url: '', anchor: '' };
+                internalLinks.push(link);
+                updateInternalLinksList();
+            }
+
+            // 내부 링크 목록 업데이트
+            function updateInternalLinksList() {
+                const container = document.getElementById('internalLinksList');
+                container.innerHTML = '';
+                
+                internalLinks.forEach((link, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex space-x-2';
+                    div.innerHTML = `
+                        <input type="url" placeholder="URL" value="${link.url}" class="flex-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" onchange="updateInternalLink(${index}, 'url', this.value)">
+                        <input type="text" placeholder="앵커 텍스트" value="${link.anchor}" class="flex-1 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" onchange="updateInternalLink(${index}, 'anchor', this.value)">
+                        <button type="button" onclick="removeInternalLink(${index})" class="text-red-600 hover:text-red-800">×</button>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            // 내부 링크 업데이트
+            function updateInternalLink(index, field, value) {
+                internalLinks[index][field] = value;
+            }
+
+            // 내부 링크 제거
+            function removeInternalLink(index) {
+                internalLinks.splice(index, 1);
+                updateInternalLinksList();
+            }
+
+            // 이미지 미리보기 및 저장
+            document.getElementById('imageUpload').addEventListener('change', function(e) {
+                const files = [...e.target.files];
+                files.forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        uploadedImages.push({
+                            file: file,
+                            dataUrl: e.target.result
+                        });
+                        updateImagePreviews();
+                    }
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            // 이미지 미리보기 업데이트
+            function updateImagePreviews() {
+                const preview = document.getElementById('imagePreviews');
+                preview.innerHTML = '';
+                
+                uploadedImages.forEach((image, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'relative';
+                    
+                    const img = document.createElement('img');
+                    img.src = image.dataUrl;
+                    img.className = 'w-full h-24 object-cover rounded-lg';
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs hover:bg-red-600';
+                    removeBtn.innerHTML = '×';
+                    removeBtn.onclick = function() {
+                        uploadedImages.splice(index, 1);
+                        updateImagePreviews();
+                    };
+                    
+                    div.appendChild(img);
+                    div.appendChild(removeBtn);
+                    preview.appendChild(div);
+                });
+            }
+
+            // 내부 링크 섹션 토글
+            document.getElementById('useInternalLinks').addEventListener('change', function(e) {
+                const section = document.getElementById('internalLinksSection');
+                section.classList.toggle('hidden', !e.target.checked);
+            });
+
+            // 자동 포스팅 설정 저장
+            async function saveSettings() {
+                const settings = {
+                    platformId: document.getElementById('wordpressAccount').value,
+                    contentStyle: document.querySelector('input[name="contentStyle"]:checked').value,
+                    keywords: document.getElementById('keywords').value,
+                    postingFrequency: document.getElementById('postingFrequency').value,
+                    keywordDensity: document.getElementById('keywordDensity').value,
+                    minWordCount: document.getElementById('minWordCount').value,
+                    useInternalLinks: document.getElementById('useInternalLinks').checked,
+                    internalLinks: internalLinks,
+                    imageCount: document.getElementById('imageCount').value
+                };
+
+                const token = localStorage.getItem('token');
+
+                try {
+                    const response = await fetch('/api/auto-post/settings', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(settings)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('설정 저장에 실패했습니다.');
+                    }
+
+                    alert('설정이 저장되었습니다.');
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert(error.message);
+                }
+            }
+
+            // 자동 포스팅 시작
+            async function startAutoPosting() {
+                try {
+                    const platformId = document.getElementById('wordpressAccount').value;
+                    if (!platformId) {
+                        alert('워드프레스 계정을 선택해주세요.');
+                        return;
+                    }
+
+                    const keywords = document.getElementById('keywords').value;
+                    if (!keywords) {
+                        alert('키워드를 입력해주세요.');
+                        return;
+                    }
+
+                    const contentStyle = document.querySelector('input[name="contentStyle"]:checked').value;
+                    
+                    const settings = {
+                        postingFrequency: document.getElementById('postingFrequency').value,
+                        minWordCount: document.getElementById('minWordCount').value,
+                        keywordDensity: document.getElementById('keywordDensity').value
+                    };
+
+                    const useInternalLinks = document.getElementById('useInternalLinks').checked;
+                    
+                    // 로딩 표시 시작
+                    setLoading(true);
+                    
+                    const response = await fetch('/api/auto-post/start', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            platformId,
+                            keywords,
+                            contentStyle,
+                            settings,
+                            useInternalLinks,
+                            internalLinks,
+                            imageCount: document.getElementById('imageCount').value
+                        })
+                    });
+
+                    const result = await response.json();
+                    
+                    // 로딩 표시 종료
+                    setLoading(false);
+                    
+                    if (!result.success) {
+                        alert(result.message || '자동 포스팅 설정 중 오류가 발생했습니다.');
+                        return;
+                    }
+
+                    // 성공 메시지 표시
+                    alert('자동 포스팅이 성공적으로 설정되었습니다.');
+                    console.log('자동 포스팅 설정 저장됨:', result);
+                    
+                    // 즉시 포스팅인 경우 바로 포스팅 실행
+                    if (settings.postingFrequency === 'immediate') {
+                        executeImmediatePosting(platformId, keywords, contentStyle);
+                    }
+                } catch (error) {
+                    setLoading(false);
+                    console.error('자동 포스팅 시작 에러:', error);
+                    alert('자동 포스팅 설정 중 오류가 발생했습니다.');
+                }
+            }
+            
+            // 즉시 포스팅 실행
+            async function executeImmediatePosting(platformId, keywords, contentStyle) {
+                try {
+                    alert('즉시 포스팅을 실행합니다. 잠시만 기다려주세요...');
+                    
+                    const response = await fetch('/api/auto-post/immediate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        },
+                        body: JSON.stringify({
+                            platformId,
+                            keywords,
+                            contentStyle
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        alert('포스팅이 성공적으로 완료되었습니다!');
+                    } else {
+                        alert(result.message || '포스팅 중 오류가 발생했습니다.');
+                    }
+                } catch (error) {
+                    console.error('즉시 포스팅 실행 에러:', error);
+                    alert('포스팅 실행 중 오류가 발생했습니다.');
+                }
+            }
+            
+            // 메시지 표시 함수
+            function showMessage(message, type) {
+                const messageElement = document.getElementById('message');
+                messageElement.textContent = message;
+                messageElement.className = `mt-4 p-3 rounded ${type === 'error' ? 'bg-red-100 text-red-700' : type === 'success' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`;
+                messageElement.style.display = 'block';
+                
+                // 5초 후 메시지 자동 숨김
+                setTimeout(function() {
+                    messageElement.style.display = 'none';
+                }, 5000);
+            }
+            
+            function showError(message) {
+                showMessage(message, 'error');
+            }
+            
+            function showSuccess(message) {
+                showMessage(message, 'success');
+            }
+            
+            function setLoading(isLoading) {
+                const button = document.getElementById('startButton');
+                if (isLoading) {
+                    button.disabled = true;
+                    button.innerHTML = '<svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 처리 중...';
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = '자동 포스팅 시작';
+                }
+            }
+
+            // 자동 포스팅 시작 버튼 이벤트 리스너
+            document.getElementById('autoPostForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                startAutoPosting();
+            });
+
+            // 모바일 내비게이션
+            function navigateTo(url) {
+                if (url) {
+                    window.location.href = url;
+                }
+            }
+
+            // 툴팁 기능 개선
+            document.addEventListener('DOMContentLoaded', function() {
+                const tooltipElements = ['postingFreqHelp', 'keywordDensityHelp', 'minWordCountHelp', 'imageCountHelp'];
+                
+                tooltipElements.forEach(elementId => {
+                    const helpElement = document.getElementById(elementId);
+                    if (!helpElement) return;
+                    
+                    const tooltip = helpElement.nextElementSibling;
+                    
+                    // 물음표에 마우스 오버 시 툴팁 표시
+                    helpElement.addEventListener('mouseenter', function() {
+                        tooltip.classList.remove('hidden');
+                    });
+                    
+                    // 물음표에서 마우스 떠날 때 툴팁 숨김
+                    helpElement.addEventListener('mouseleave', function() {
+                        // 클릭 상태가 아닐 때만 숨김
+                        if (!tooltip.classList.contains('clicked')) {
+                            tooltip.classList.add('hidden');
+                        }
+                    });
+                    
+                    // 물음표 클릭 시 툴팁 토글
+                    helpElement.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        tooltip.classList.toggle('hidden');
+                        tooltip.classList.toggle('clicked');
+                        
+                        // 10초 후 자동으로 툴팁 닫기
+                        if (!tooltip.classList.contains('hidden')) {
+                            setTimeout(function() {
+                                tooltip.classList.add('hidden');
+                                tooltip.classList.remove('clicked');
+                            }, 10000);
+                        }
+                    });
+                });
+                
+                // 문서 클릭 시 툴팁 닫기
+                document.addEventListener('click', function(e) {
+                    tooltipElements.forEach(elementId => {
+                        const helpElement = document.getElementById(elementId);
+                        if (!helpElement) return;
+                        
+                        const tooltip = helpElement.nextElementSibling;
+                        if (e.target !== helpElement && !tooltip.contains(e.target)) {
+                            tooltip.classList.add('hidden');
+                            tooltip.classList.remove('clicked');
+                        }
+                    });
+                });
+            });
+            
+            // 초기화
+            document.addEventListener('DOMContentLoaded', function() {
+                // 사용자 정보 최신화
+                updateUserInfo().then(() => {
+                    loadSettings();
+                    loadWordpressAccounts();
+                    initUIByUserLevel(); 
+                    
+                    // 내부 링크 섹션 토글
+                    document.getElementById('useInternalLinks').addEventListener('change', function(e) {
+                        const section = document.getElementById('internalLinksSection');
+                        section.classList.toggle('hidden', !e.target.checked);
+                    });
+                    
+                    // 로그인 상태 확인
+                    const token = localStorage.getItem('token');
+                    if (!token) {
+                        // 토큰이 없으면 로그인 페이지로 리디렉션
+                        window.location.href = '/login.html';
+                    }
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

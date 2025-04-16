@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>시스템 설정 - Auto Posting Service</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen">
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a href="/dashboard.html" class="text-xl font-bold">Auto Posting Service</a>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span id="adminBadge" class="mr-4 px-2 py-1 bg-red-600 text-white rounded-md text-sm font-medium">관리자</span>
+                        <button onclick="logout()" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex">
+            <!-- 사이드바 -->
+            <div class="w-64 bg-white shadow-lg h-screen">
+                <nav class="mt-5">
+                    <a href="/dashboard.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        대시보드
+                    </a>
+                    <a href="/admin.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        관리자 메뉴
+                    </a>
+                    <a href="/admin-notices.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/>
+                        </svg>
+                        공지사항 관리
+                    </a>
+                    <a href="/admin-inquiries.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+                        </svg>
+                        문의 관리
+                    </a>
+                    <a href="/admin-users.html" class="flex items-center px-6 py-2 text-gray-600 hover:bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                        사용자 관리
+                    </a>
+                    <a href="/admin-system.html" class="flex items-center px-6 py-2 text-gray-700 bg-gray-100">
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        시스템 설정
+                    </a>
+                </nav>
+            </div>
+
+            <!-- 메인 컨텐츠 -->
+            <div class="flex-1 p-10">
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+                        <div class="p-6">
+                            <h2 class="text-2xl font-bold mb-6">시스템 설정</h2>
+                            
+                            <!-- 일반 회원 설정 -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">일반 회원 (Level 1) 설정</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="mb-4">
+                                        <label for="dailyPostLimit" class="block text-sm font-medium text-gray-700 mb-1">일일 포스팅 제한</label>
+                                        <input type="number" id="dailyPostLimit" class="w-full max-w-xs py-2 px-3 border border-gray-300 rounded-md" min="1" value="3">
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="maxPlatforms" class="block text-sm font-medium text-gray-700 mb-1">최대 계정 수</label>
+                                        <input type="number" id="maxPlatforms" class="w-full max-w-xs py-2 px-3 border border-gray-300 rounded-md" min="1" value="1">
+                                    </div>
+                                    <div class="mb-4">
+                                        <p class="block text-sm font-medium text-gray-700 mb-1">사용 가능 기능</p>
+                                        <div class="space-y-2">
+                                            <div class="flex items-center">
+                                                <input type="checkbox" id="level1InstantPosting" checked disabled class="mr-2">
+                                                <label for="level1InstantPosting" class="text-sm text-gray-700">즉시 포스팅 (기본 기능)</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- VIP 회원 설정 -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">VIP 회원 설정</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <p class="text-sm text-gray-600 mb-2">VIP 회원은 다음 기능을 사용할 수 있습니다:</p>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="vipInstantPosting" checked disabled class="mr-2">
+                                            <label for="vipInstantPosting" class="text-sm text-gray-700">즉시 포스팅</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="vipScheduledPosting" checked class="mr-2">
+                                            <label for="vipScheduledPosting" class="text-sm text-gray-700">예약 포스팅</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="vipMultiPlatform" checked class="mr-2">
+                                            <label for="vipMultiPlatform" class="text-sm text-gray-700">다중 계정 관리</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="vipImageLibrary" checked class="mr-2">
+                                            <label for="vipImageLibrary" class="text-sm text-gray-700">이미지 라이브러리</label>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <input type="checkbox" id="vipAdvancedSettings" checked class="mr-2">
+                                            <label for="vipAdvancedSettings" class="text-sm text-gray-700">고급 설정</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 시스템 유지보수 -->
+                            <div class="mb-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">시스템 관리</h3>
+                                <div class="bg-gray-50 p-4 rounded-lg">
+                                    <div class="mt-4">
+                                        <label for="systemVersion" class="block text-sm font-medium text-gray-700 mb-1">시스템 버전</label>
+                                        <input type="text" id="systemVersion" class="w-full max-w-xs py-2 px-3 border border-gray-300 rounded-md" value="1.0.0" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 저장 버튼 -->
+                            <div class="mt-6">
+                                <button id="saveSettingsBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                                    설정 저장
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 토큰 체크 및 관리자 권한 확인
+        checkAdminAuth();
+        
+        function checkAdminAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+            
+            // 관리자 권한 확인
+            fetch('/api/auth/check-admin', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success || !data.isAdmin) {
+                    alert('관리자 권한이 필요합니다.');
+                    window.location.href = '/dashboard.html';
+                }
+            })
+            .catch(err => {
+                console.error('관리자 권한 확인 오류:', err);
+                window.location.href = '/dashboard.html';
+            });
+        }
+        
+        // 로그아웃
+        function logout() {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+        
+        // 시스템 설정 로드
+        async function loadSystemConfig() {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/admin/system-config', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.config) {
+                    const config = data.config;
+                    
+                    // Level 1 설정
+                    if (config.level1) {
+                        document.getElementById('dailyPostLimit').value = config.level1.dailyPostLimit || 3;
+                        document.getElementById('maxPlatforms').value = config.level1.maxPlatforms || 1;
+                    }
+                    
+                    // VIP 설정
+                    if (config.vip && config.vip.features) {
+                        document.getElementById('vipScheduledPosting').checked = config.vip.features.includes('scheduledPosting');
+                        document.getElementById('vipMultiPlatform').checked = config.vip.features.includes('multiPlatform');
+                        document.getElementById('vipImageLibrary').checked = config.vip.features.includes('imageLibrary');
+                        document.getElementById('vipAdvancedSettings').checked = config.vip.features.includes('advancedSettings');
+                    }
+                    
+                    // 시스템 설정
+                    if (config.system) {
+                        if (config.system.version) {
+                            document.getElementById('systemVersion').value = config.system.version;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('시스템 설정 로드 오류:', error);
+                alert('시스템 설정을 불러오는 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 설정 저장
+        async function saveSystemConfig() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                // 설정 값 가져오기
+                const dailyPostLimit = parseInt(document.getElementById('dailyPostLimit').value) || 3;
+                const maxPlatforms = parseInt(document.getElementById('maxPlatforms').value) || 1;
+                
+                const vipFeatures = ['instantPosting'];
+                if (document.getElementById('vipScheduledPosting').checked) vipFeatures.push('scheduledPosting');
+                if (document.getElementById('vipMultiPlatform').checked) vipFeatures.push('multiPlatform');
+                if (document.getElementById('vipImageLibrary').checked) vipFeatures.push('imageLibrary');
+                if (document.getElementById('vipAdvancedSettings').checked) vipFeatures.push('advancedSettings');
+                
+                const config = {
+                    level1: {
+                        dailyPostLimit,
+                        maxPlatforms,
+                        features: ['instantPosting']
+                    },
+                    vip: {
+                        features: vipFeatures
+                    }
+                };
+                
+                const response = await fetch('/admin/system-config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(config)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('시스템 설정이 저장되었습니다');
+                } else {
+                    alert(result.message || '시스템 설정 저장에 실패했습니다');
+                }
+            } catch (error) {
+                console.error('시스템 설정 저장 오류:', error);
+                alert('시스템 설정을 저장하는 중 오류가 발생했습니다');
+            }
+        }
+        
+        // 이벤트 리스너 등록
+        document.addEventListener('DOMContentLoaded', function() {
+            // 시스템 설정 로드
+            loadSystemConfig();
+            
+            // 설정 저장 버튼
+            document.getElementById('saveSettingsBtn').addEventListener('click', saveSystemConfig);
+        });
+    </script>
+</body>
+</html>
