@@ -27,6 +27,10 @@
                         <input id="username" name="username" type="text" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="아이디">
                     </div>
                     <div>
+                        <label for="email" class="sr-only">이메일</label>
+                        <input id="email" name="email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="이메일">
+                    </div>
+                    <div>
                         <label for="password" class="sr-only">비밀번호</label>
                         <input id="password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm" placeholder="비밀번호">
                     </div>
@@ -50,6 +54,7 @@
             e.preventDefault();
             
             const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const passwordConfirm = document.getElementById('passwordConfirm').value;
 
@@ -67,6 +72,7 @@
                     },
                     body: JSON.stringify({ 
                         username, 
+                        email,
                         password,
                         passwordConfirm
                     }),
