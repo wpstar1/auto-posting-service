@@ -373,8 +373,10 @@
                 try {
                     // 사용자 정보가 있으면 그 정보에서 레벨과 멤버십 상태 함께 확인
                     const userInfo = JSON.parse(localStorage.getItem('userInfo') || '{}');
-                    // VIP 레벨이고 멤버십 상태가 active인 경우에만 VIP로 인정
-                    return (userInfo.level === 'vip' && userInfo.membershipStatus === 'active') ? 'vip' : 'level1';
+                    console.log('사용자 정보:', userInfo); // 디버깅을 위한 로그
+                    
+                    // VIP 레벨이거나 멤버십 상태가 vip 또는 active인 경우 VIP로 인정
+                    return (userInfo.level === 'vip' || userInfo.membershipStatus === 'vip' || userInfo.membershipStatus === 'active' || userInfo.role === 'admin') ? 'vip' : 'level1';
                 } catch (e) {
                     console.error('사용자 정보 파싱 오류:', e);
                     return 'level1'; // 오류 발생 시 기본값
