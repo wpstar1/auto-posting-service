@@ -135,6 +135,11 @@
                                 <input type="password" id="appPassword" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                 <p class="mt-1 text-xs text-gray-500">※ 워드프레스 관리자 > 프로필 > 애플리케이션 비밀번호에서 생성</p>
                             </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">API 키 (REST API)</label>
+                                <input type="text" id="appKey" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                <p class="mt-1 text-xs text-gray-500">※ 워드프레스 REST API 키. 없으면 "key123"과 같이 임의 값 입력 가능</p>
+                            </div>
                         </div>
                         <div class="mt-6 flex justify-end space-x-3">
                             <button type="button" id="cancelBtn" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
@@ -178,12 +183,14 @@
             const siteUrl = document.getElementById('siteUrl').value;
             const username = document.getElementById('username').value;
             const appPassword = document.getElementById('appPassword').value;
+            const appKey = document.getElementById('appKey').value;
             
             const accountData = {
                 name: accountName,
                 url: siteUrl,
                 username: username,
-                password: appPassword
+                password: appPassword,
+                appKey: appKey
             };
             
             try {
@@ -312,6 +319,7 @@
                     document.getElementById('siteUrl').value = account.url;
                     document.getElementById('username').value = account.username;
                     document.getElementById('appPassword').value = '';  // 보안상 비밀번호는 표시하지 않음
+                    document.getElementById('appKey').value = account.appKey;
                     
                     currentEditId = id;
                     document.getElementById('accountModal').classList.remove('hidden');
