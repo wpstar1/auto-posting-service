@@ -894,14 +894,14 @@ async function postToWordPress({ platform, title, content, imageCount }) {
         let featuredImageId = null;
         if (imageCount > 0) {
             try {
-                // Unsplash API에서 무료 이미지 가져오기 (실제로는 API 키가 필요하므로 여기서는 고정 이미지 URL 사용)
-                const imageUrl = await getRandomImageForKeyword(title);
+                // 이미지 URL 가져오기 (userId 파라미터 추가)
+                const imageResult = await getRandomImageForKeyword(title, platform.userId);
                 
-                if (imageUrl) {
-                    console.log('이미지 URL 가져옴:', imageUrl);
+                if (imageResult && imageResult.url) {
+                    console.log('이미지 URL 가져옴:', imageResult.url);
                     
                     // 이미지 데이터 가져오기
-                    const imageResponse = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+                    const imageResponse = await axios.get(imageResult.url, { responseType: 'arraybuffer' });
                     const buffer = Buffer.from(imageResponse.data, 'binary');
                     
                     // 이미지 타입 확인
