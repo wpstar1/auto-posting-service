@@ -72,6 +72,28 @@
                             </select>
                         </div>
 
+                        <!-- WordPress API 타입 선택 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">WordPress API 타입</label>
+                            <div class="mt-1 flex items-center space-x-2">
+                                <select id="apiType" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="rest">REST API (권장)</option>
+                                    <option value="xmlrpc">XML-RPC</option>
+                                </select>
+                                <div class="relative">
+                                    <button type="button" id="apiInfoButton" class="text-gray-400 hover:text-gray-500">
+                                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                    <div id="apiInfoTooltip" class="hidden absolute z-10 w-72 bg-gray-800 text-white text-xs rounded p-2 -left-80 top-0">
+                                        <p><strong>REST API</strong>: 최신 WordPress에서 권장하는 방식으로 보안이 강화되었습니다.</p>
+                                        <p class="mt-1"><strong>XML-RPC</strong>: 일부 구형 워드프레스 또는 REST API가 제대로 작동하지 않는 호스팅에서 사용합니다.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 제목 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">제목</label>
@@ -318,6 +340,7 @@
             const platformId = document.getElementById('platformId').value;
             const title = document.getElementById('title').value;
             const content = tinymce.get('content').getContent();
+            const apiType = document.getElementById('apiType').value; // API 타입 가져오기
             
             if (!platformId || !title || !content) {
                 alert('모든 필수 항목을 입력해주세요.');
@@ -329,6 +352,7 @@
                 formData.append('platformId', platformId);
                 formData.append('title', title);
                 formData.append('content', content);
+                formData.append('apiType', apiType); // API 타입 추가
                 
                 // 예약 설정이 활성화된 경우
                 const scheduleDate = document.getElementById('scheduleDate');
@@ -456,6 +480,15 @@
         // 초기화
         loadPlatforms();
         checkUserLevel();
+
+        // API 정보 툴팁 기능
+        document.getElementById('apiInfoButton').addEventListener('mouseenter', () => {
+            document.getElementById('apiInfoTooltip').classList.remove('hidden');
+        });
+
+        document.getElementById('apiInfoButton').addEventListener('mouseleave', () => {
+            document.getElementById('apiInfoTooltip').classList.add('hidden');
+        });
     </script>
 </body>
 </html>
