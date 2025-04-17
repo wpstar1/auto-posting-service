@@ -748,41 +748,32 @@
                     console.log('[startAutoPosting] imageCount:', imageCount);
                     console.log('[startAutoPosting] postingFrequency:', postingFrequency);
 
-                    const settings = {
-                        platformId,
-                        keywords,
-                        contentStyle,
-                        keywordDensity,
-                        minWordCount,
-                        imageCount,
-                        postingFrequency
-                    };
-
+                    // 실제 포스팅을 바로 실행하도록 수정
                     setLoading(true);
                     const token = localStorage.getItem('token');
-                    const response = await fetch('/api/auto-post/settings', {
+                    const response = await fetch('/api/auto-post/immediate', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify(settings)
+                        body: JSON.stringify({
+                            platformId,
+                            keywords,
+                            contentStyle,
+                            keywordDensity,
+                            minWordCount,
+                            imageCount
+                        })
                     });
                     setLoading(false);
                     const result = await response.json();
                     if (!response.ok || !result.success) {
-                        alert(result.message || '자동 포스팅 설정 저장에 실패했습니다.');
+                        alert(result.message || '포스팅에 실패했습니다.');
                         return;
                     }
-
-                    alert('자동 포스팅이 성공적으로 설정되었습니다.');
-                    console.log('자동 포스팅 설정 저장됨:', result);
-
-                    // 즉시 포스팅인 경우 바로 포스팅 실행
-                    if (settings.postingFrequency === 'immediate') {
-                        console.log('[startAutoPosting] 즉시 포스팅 실행 (executeImmediatePosting 호출)');
-                        executeImmediatePosting(platformId, keywords, contentStyle, keywordDensity, minWordCount, imageCount);
-                    }
+                    alert('포스팅이 성공적으로 완료되었습니다!');
+                    console.log('포스팅 결과:', result);
                 } catch (err) {
                     setLoading(false);
                     console.error('자동 포스팅 시작 에러:', err);

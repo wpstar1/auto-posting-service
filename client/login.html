@@ -107,21 +107,21 @@
         });
 
         // 저장된 아이디/자동로그인 적용
-        window.addEventListener('DOMContentLoaded', () => {
-            const savedId = localStorage.getItem('savedId');
-            const autoLogin = localStorage.getItem('autoLogin');
-            if (savedId) {
-                document.getElementById('username').value = savedId;
-                document.getElementById('saveId').checked = true;
-            }
-            if (autoLogin === 'true') {
-                document.getElementById('autoLogin').checked = true;
-                document.getElementById('username').value = localStorage.getItem('autoLoginId') || '';
-                document.getElementById('password').value = localStorage.getItem('autoLoginPw') || '';
-                // 자동로그인 실행
-                document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-            }
-        });
+        // window.addEventListener('DOMContentLoaded', () => {
+        //     const savedId = localStorage.getItem('savedId');
+        //     const autoLogin = localStorage.getItem('autoLogin');
+        //     if (savedId) {
+        //         document.getElementById('username').value = savedId;
+        //         document.getElementById('saveId').checked = true;
+        //     }
+        //     if (autoLogin === 'true') {
+        //         document.getElementById('autoLogin').checked = true;
+        //         document.getElementById('username').value = localStorage.getItem('autoLoginId') || '';
+        //         document.getElementById('password').value = localStorage.getItem('autoLoginPw') || '';
+        //         // 자동로그인 실행
+        //         document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+        //     }
+        // });
     </script>
 </body>
 </html>
