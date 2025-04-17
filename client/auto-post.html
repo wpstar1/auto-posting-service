@@ -732,23 +732,21 @@
             async function startAutoPosting() {
                 try {
                     const platformId = document.getElementById('wordpressAccount').value;
-                    if (!platformId) {
-                        alert('워드프레스 계정을 선택해주세요.');
-                        return;
-                    }
-
                     const keywords = document.getElementById('keywords').value;
-                    if (!keywords) {
-                        alert('키워드를 입력해주세요.');
-                        return;
-                    }
-
                     const contentStyle = document.querySelector('input[name="contentStyle"]:checked').value;
-
-                    // 랜덤/실제값 반영: 아래 함수들로 값 할당
                     const keywordDensity = getSelectedKeywordDensity();
                     const minWordCount = getSelectedMinWordCount();
                     const imageCount = getSelectedImageCount();
+                    const postingFrequency = document.getElementById('postingFrequency') ? document.getElementById('postingFrequency').value : 'immediate';
+
+                    // 콘솔 로그 추가 (디버깅용)
+                    console.log('[startAutoPosting] platformId:', platformId);
+                    console.log('[startAutoPosting] keywords:', keywords);
+                    console.log('[startAutoPosting] contentStyle:', contentStyle);
+                    console.log('[startAutoPosting] keywordDensity:', keywordDensity);
+                    console.log('[startAutoPosting] minWordCount:', minWordCount);
+                    console.log('[startAutoPosting] imageCount:', imageCount);
+                    console.log('[startAutoPosting] postingFrequency:', postingFrequency);
 
                     const settings = {
                         platformId,
@@ -757,7 +755,7 @@
                         keywordDensity,
                         minWordCount,
                         imageCount,
-                        // ... 기존에 settings에 들어가던 값들 필요시 추가 ...
+                        postingFrequency
                     };
 
                     setLoading(true);
@@ -777,13 +775,12 @@
                         return;
                     }
 
-                    // 성공 메시지 표시
                     alert('자동 포스팅이 성공적으로 설정되었습니다.');
                     console.log('자동 포스팅 설정 저장됨:', result);
-                    
+
                     // 즉시 포스팅인 경우 바로 포스팅 실행
                     if (settings.postingFrequency === 'immediate') {
-                        // executeImmediatePosting에 랜덤값 적용
+                        console.log('[startAutoPosting] 즉시 포스팅 실행 (executeImmediatePosting 호출)');
                         executeImmediatePosting(platformId, keywords, contentStyle, keywordDensity, minWordCount, imageCount);
                     }
                 } catch (err) {
