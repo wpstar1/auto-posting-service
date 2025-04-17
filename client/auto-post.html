@@ -18,7 +18,7 @@
                 overflow-x: hidden !important;
             }
             .mobile-text-sm {
-                font-size: 0.875rem !important;
+                font-size: 0.95rem !important;
             }
             .mobile-grid-1 {
                 grid-template-columns: 1fr !important;
@@ -42,6 +42,22 @@
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
+            .wide-select, .wide-input {
+                min-width: 120px !important;
+                width: 100% !important;
+                font-size: 1.1em !important;
+            }
+        }
+        .wide-select, .wide-input {
+            min-width: 220px;
+            width: 100%;
+            font-size: 1.05em;
+        }
+        .horizontal-guide {
+            color: #666;
+            font-size: 0.95em;
+            margin: 0.5em 0 0.5em 0;
+            display: block;
         }
         
         /* 툴팁 스타일 개선 */
@@ -135,13 +151,10 @@
                             <h2 class="text-2xl font-bold mb-6 mobile-text-sm mobile-mb-2">자동 포스팅 설정</h2>
                             
                             <!-- 모바일 메뉴 (모바일에서만 표시) -->
-                            <div class="hidden mobile-block mb-4">
-                                <select id="mobileNavigation" class="w-full p-2 border border-gray-300 rounded shadow-sm" onchange="navigateTo(this.value)">
-                                    <option value="" selected disabled>메뉴 선택</option>
-                                    <option value="/dashboard.html">대시보드</option>
-                                    <option value="/auto-post.html">자동 포스팅</option>
-                                    <option value="/platforms.html">계정 관리</option>
-                                    <option value="/support.html">고객센터</option>
+                            <div class="md:hidden block mb-4">
+                                <select class="wide-select" id="mobileMenuSelect">
+                                    <option>자동 포스팅</option>
+                                    <!-- 필요시 다른 메뉴 추가 -->
                                 </select>
                             </div>
                             
@@ -149,9 +162,12 @@
                                 <!-- 워드프레스 계정 선택 -->
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">워드프레스 계정</label>
-                                    <select id="wordpressAccount" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                        <option value="">계정을 선택하세요</option>
-                                    </select>
+                                    <div class="flex items-center space-x-2">
+                                        <select id="wordpressAccount" required class="mt-1 block wide-select border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                            <!-- 계정 옵션 -->
+                                        </select>
+                                        <button type="button" id="editAccountBtn" class="px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 border border-gray-300">수정</button>
+                                    </div>
                                 </div>
 
                                 <!-- 콘텐츠 스타일 -->
@@ -182,7 +198,7 @@
                                         <div class="flex items-center">
                                             <input type="radio" id="random_style" name="contentStyle" value="random" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300">
                                             <label for="random_style" class="ml-2 block">
-                                                <span class="text-sm font-medium text-gray-900">랜덤 스타일</span>
+                                                <span class="text-sm font-medium text-gray-900">랜덤 스타일 (추천)</span>
                                                 <p class="text-sm text-gray-500">여러 스타일을 랜덤하게 선택하여 다양성 유지</p>
                                             </label>
                                         </div>
@@ -195,47 +211,8 @@
                                     <div class="mt-4 space-y-4">
                                         <div>
                                             <label class="block text-sm font-medium text-gray-700">주제 키워드</label>
-                                            <input type="text" id="keywords" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="예: 디지털마케팅, SNS전략, 온라인광고">
+                                            <input type="text" id="keywords" required class="mt-1 block wide-input border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="예: 디지털마케팅, SNS전략, 온라인광고">
                                             <p class="mt-1 text-sm text-gray-500">여러 키워드는 쉼표로 구분해주세요</p>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-700">포스팅 주기
-                                                <span class="tooltip-container">
-                                                    <span class="text-blue-500 hover:text-blue-700" id="postingFreqHelp">?</span>
-                                                    <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
-                                                        랜덤 포스팅은 검색엔진 랭킹 향상에 가장 효과적입니다. 자연스러운 패턴으로 포스팅하여 검색 알고리즘에 더 잘 노출됩니다.
-                                                    </div>
-                                                </span>
-                                            </label>
-                                            <select id="postingFrequency" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                                <option value="immediate" selected>즉시 포스팅 (1회)</option>
-                                                <option value="random" class="vip-only">랜덤 (VIP 전용)</option>
-                                                <option value="1" class="vip-only">1시간마다</option>
-                                                <option value="2" class="vip-only">2시간마다</option>
-                                                <option value="3" class="vip-only">3시간마다</option>
-                                                <option value="4" class="vip-only">4시간마다</option>
-                                                <option value="5" class="vip-only">5시간마다</option>
-                                                <option value="6" class="vip-only">6시간마다</option>
-                                                <option value="7" class="vip-only">7시간마다</option>
-                                                <option value="8" class="vip-only">8시간마다</option>
-                                                <option value="9" class="vip-only">9시간마다</option>
-                                                <option value="10" class="vip-only">10시간마다</option>
-                                                <option value="11" class="vip-only">11시간마다</option>
-                                                <option value="12" class="vip-only">12시간마다</option>
-                                                <option value="13" class="vip-only">13시간마다</option>
-                                                <option value="14" class="vip-only">14시간마다</option>
-                                                <option value="15" class="vip-only">15시간마다</option>
-                                                <option value="16" class="vip-only">16시간마다</option>
-                                                <option value="17" class="vip-only">17시간마다</option>
-                                                <option value="18" class="vip-only">18시간마다</option>
-                                                <option value="19" class="vip-only">19시간마다</option>
-                                                <option value="20" class="vip-only">20시간마다</option>
-                                                <option value="21" class="vip-only">21시간마다</option>
-                                                <option value="22" class="vip-only">22시간마다</option>
-                                                <option value="23" class="vip-only">23시간마다</option>
-                                                <option value="24" class="vip-only">24시간마다</option>
-                                            </select>
                                         </div>
 
                                         <div>
@@ -244,13 +221,15 @@
                                                     <span class="text-blue-500 hover:text-blue-700" id="keywordDensityHelp">?</span>
                                                     <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
                                                         1.5% – 조금 더 자연스럽고 과도한 반복 피할 때 좋음.<br>
-                                                        2% – 자연스럽고 SEO에 가장 이상적. (과하지도, 부족하지도 않음)
+                                                        2% – 자연스럽고 SEO에 가장 이상적. (과하지도, 부족하지도 않음)<br>
+                                                        랜덤 (추천) – 상황에 따라 자동 조정 (추천)
                                                     </div>
                                                 </span>
                                             </label>
-                                            <select id="keywordDensity" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                            <select id="keywordDensity" required class="mt-1 block wide-select border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="random">랜덤 (추천)</option>
                                                 <option value="1.5">1.5%</option>
-                                                <option value="2" selected>2%</option>
+                                                <option value="2">2%</option>
                                             </select>
                                         </div>
 
@@ -259,20 +238,20 @@
                                                 <span class="tooltip-container">
                                                     <span class="text-blue-500 hover:text-blue-700" id="minWordCountHelp">?</span>
                                                     <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
-                                                        <strong>SEO에 좋은 워드프레스 포스트 길이 3가지 추천</strong><br>
-                                                        500~800단어 – 기본 SEO 통과선.<br>
-                                                        1000~2000단어 – 검색엔진이 좋아함. 상위 노출 확률 ↑<br>
-                                                        3,000단어 이상 – 심층 콘텐츠, 경쟁 키워드에 효과적.<br><br>
-                                                        하지만 너무 반복되는 글자갯수는 좋지못합니다. 랜덤을 선택하세요.
+                                                        300단어 – 짧고 간결한 글에 적합<br>
+                                                        500~800단어 – 중간 길이, 일반적인 블로그에 적합<br>
+                                                        1000~2000단어 – 심층적이고 전문적인 글에 적합<br>
+                                                        3000단어 – 매우 긴 글, 심층 분석용<br>
+                                                        랜덤 (추천) – 상황에 따라 자동 조정 (추천)
                                                     </div>
                                                 </span>
                                             </label>
-                                            <select id="minWordCount" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                                <option value="500">500단어</option>
-                                                <option value="800" class="vip-only">500~800단어 (VIP 전용)</option>
-                                                <option value="2000" class="vip-only">1,000~2,000단어 (VIP 전용)</option>
-                                                <option value="3000" class="vip-only">3,000단어 이상 (VIP 전용)</option>
-                                                <option value="random" class="vip-only">랜덤 (VIP 전용)</option>
+                                            <select id="minWordCount" required class="mt-1 block wide-select border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="300" selected>300단어</option>
+                                                <option value="500-800">500~800 단어</option>
+                                                <option value="1000-2000">1000~2000 단어</option>
+                                                <option value="3000">3000단어</option>
+                                                <option value="random">랜덤 (추천)</option>
                                             </select>
                                         </div>
 
@@ -281,17 +260,18 @@
                                                 <span class="tooltip-container">
                                                     <span class="text-blue-500 hover:text-blue-700" id="imageCountHelp">?</span>
                                                     <div class="tooltip-text hidden bg-black text-white text-xs rounded absolute">
-                                                        이미지를 추가하시면 AI 이미지와 랜덤으로 업로드 됩니다. 이미지를 1~5개 추가하신 후 랜덤으로 진행하시면 SEO에 좋습니다.
+                                                        1, 2, 3개 중 선택 가능<br>
+                                                        랜덤 (추천) – 상황에 따라 자동 조정 (추천)
                                                     </div>
                                                 </span>
                                             </label>
-                                            <select id="imageCount" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                                <option value="0">이미지 사용 안함</option>
-                                                <option value="1" selected>1개</option>
-                                                <option value="2" class="vip-only">2개 (VIP 전용)</option>
-                                                <option value="3" class="vip-only">3개 (VIP 전용)</option>
-                                                <option value="random" class="vip-only">1~3개 랜덤 (VIP 전용)</option>
+                                            <select id="imageCount" class="mt-1 block wide-select border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                                <option value="random">랜덤 (추천)</option>
+                                                <option value="1">1개</option>
+                                                <option value="2">2개</option>
+                                                <option value="3">3개</option>
                                             </select>
+                                            <span class="horizontal-guide">이미지는 최대 5개 업로드 가능</span>
                                         </div>
                                     </div>
                                 </div>
@@ -317,16 +297,6 @@
                                     <h3 class="text-lg font-medium text-gray-900 mb-4">이미지 설정</h3>
                                     <div class="space-y-4">
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-700">포스팅당 이미지 수</label>
-                                            <select id="imageCount" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                                <option value="0">이미지 사용 안함</option>
-                                                <option value="1" selected>1개</option>
-                                                <option value="2" class="vip-only">2개 (VIP 전용)</option>
-                                                <option value="3" class="vip-only">3개 (VIP 전용)</option>
-                                                <option value="random" class="vip-only">1~3개 랜덤 (VIP 전용)</option>
-                                            </select>
-                                        </div>
-                                        <div class="mt-2">
                                             <label class="block text-sm font-medium text-gray-700">이미지 직접 추가
                                                 <span id="imageUploadVipHelp" class="ml-1 text-xs text-red-500 hidden">(VIP 전용 기능)</span>
                                             </label>
@@ -774,42 +744,36 @@
                     }
 
                     const contentStyle = document.querySelector('input[name="contentStyle"]:checked').value;
-                    
+
+                    // 랜덤/실제값 반영: 아래 함수들로 값 할당
+                    const keywordDensity = getSelectedKeywordDensity();
+                    const minWordCount = getSelectedMinWordCount();
+                    const imageCount = getSelectedImageCount();
+
                     const settings = {
-                        postingFrequency: document.getElementById('postingFrequency').value,
-                        minWordCount: document.getElementById('minWordCount').value,
-                        keywordDensity: document.getElementById('keywordDensity').value
+                        platformId,
+                        keywords,
+                        contentStyle,
+                        keywordDensity,
+                        minWordCount,
+                        imageCount,
+                        // ... 기존에 settings에 들어가던 값들 필요시 추가 ...
                     };
 
-                    const useInternalLinks = document.getElementById('useInternalLinks').checked;
-                    
-                    // 로딩 표시 시작
                     setLoading(true);
-                    
-                    const response = await fetch('/api/auto-post/start', {
+                    const token = localStorage.getItem('token');
+                    const response = await fetch('/api/auto-post/settings', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            'Authorization': `Bearer ${token}`
                         },
-                        body: JSON.stringify({
-                            platformId,
-                            keywords,
-                            contentStyle,
-                            settings,
-                            useInternalLinks,
-                            internalLinks,
-                            imageCount: document.getElementById('imageCount').value
-                        })
+                        body: JSON.stringify(settings)
                     });
-
-                    const result = await response.json();
-                    
-                    // 로딩 표시 종료
                     setLoading(false);
-                    
-                    if (!result.success) {
-                        alert(result.message || '자동 포스팅 설정 중 오류가 발생했습니다.');
+                    const result = await response.json();
+                    if (!response.ok || !result.success) {
+                        alert(result.message || '자동 포스팅 설정 저장에 실패했습니다.');
                         return;
                     }
 
@@ -819,17 +783,18 @@
                     
                     // 즉시 포스팅인 경우 바로 포스팅 실행
                     if (settings.postingFrequency === 'immediate') {
-                        executeImmediatePosting(platformId, keywords, contentStyle);
+                        // executeImmediatePosting에 랜덤값 적용
+                        executeImmediatePosting(platformId, keywords, contentStyle, keywordDensity, minWordCount, imageCount);
                     }
-                } catch (error) {
+                } catch (err) {
                     setLoading(false);
-                    console.error('자동 포스팅 시작 에러:', error);
-                    alert('자동 포스팅 설정 중 오류가 발생했습니다.');
+                    console.error('자동 포스팅 시작 에러:', err);
+                    alert('포스팅 중 오류가 발생했습니다: ' + (err.message || err));
                 }
             }
             
-            // 즉시 포스팅 실행
-            async function executeImmediatePosting(platformId, keywords, contentStyle) {
+            // 즉시 포스팅 실행 함수도 인자 추가
+            async function executeImmediatePosting(platformId, keywords, contentStyle, keywordDensity, minWordCount, imageCount) {
                 try {
                     alert('즉시 포스팅을 실행합니다. 잠시만 기다려주세요...');
                     
@@ -842,7 +807,10 @@
                         body: JSON.stringify({
                             platformId,
                             keywords,
-                            contentStyle
+                            contentStyle,
+                            keywordDensity,
+                            minWordCount,
+                            imageCount
                         })
                     });
                     
@@ -874,6 +842,7 @@
             
             function showError(message) {
                 showMessage(message, 'error');
+                alert(message);
             }
             
             function showSuccess(message) {
@@ -894,7 +863,11 @@
             // 자동 포스팅 시작 버튼 이벤트 리스너
             document.getElementById('autoPostForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                startAutoPosting();
+                try {
+                    await startAutoPosting();
+                } catch (err) {
+                    showError('포스팅 중 오류가 발생했습니다: ' + (err.message || err));
+                }
             });
 
             // 모바일 내비게이션
@@ -980,6 +953,33 @@
                     }
                 });
             });
+            
+            // 랜덤 옵션 실제 동작 처리
+            function getSelectedKeywordDensity() {
+                const val = document.getElementById('keywordDensity').value;
+                if (val === 'random') {
+                    // 랜덤 1.5%~2% 중 하나 반환
+                    return Math.random() > 0.5 ? 1.5 : 2;
+                }
+                return parseFloat(val);
+            }
+            function getSelectedMinWordCount() {
+                const val = document.getElementById('minWordCount').value;
+                if (val === 'random') {
+                    // 300, 500~800, 1000~2000, 3000 중 랜덤
+                    const options = ['300', '500-800', '1000-2000', '3000'];
+                    return options[Math.floor(Math.random() * options.length)];
+                }
+                return val;
+            }
+            function getSelectedImageCount() {
+                const val = document.getElementById('imageCount').value;
+                if (val === 'random') {
+                    // 1, 2, 3 중 랜덤
+                    return (Math.floor(Math.random() * 3) + 1).toString();
+                }
+                return val;
+            }
         </script>
     </div>
 </body>
