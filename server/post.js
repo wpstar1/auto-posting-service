@@ -282,7 +282,7 @@ async function postToWordPress(title, content, featuredImageId = null, platformD
 }
 
 // AI로 컨텐츠 생성 (OpenAI API 사용)
-async function generateAIContent(keyword) {
+async function generateAIContent(keyword, postData = null) {
   try {
     const openaiApiKey = process.env.OPENAI_API_KEY;
     
@@ -296,13 +296,13 @@ async function generateAIContent(keyword) {
     // 다양한 프롬프트 템플릿 중 랜덤하게 선택
     const promptTemplates = [
       // 전문가 가이드 스타일
-      `당신은 ${keyword} 분야의 전문가입니다. 이 주제에 대한 전문적인 가이드 스타일의 블로그 글을 작성해주세요. 중요한 개념을 설명하고, 실용적인 조언과 팁을 포함하세요. 정확한 정보와 전문 용어를 적절히 사용하고, 독자에게 실질적인 가치를 제공하는 콘텐츠를 HTML 형식으로 작성해주세요.`,
+      `당신은 ${keyword} 분야의 전문가입니다. 이 주제에 대한 전문적인 가이드 스타일의 블로그 글을 작성해주세요. 중요한 개념을 설명하고, 실용적인 조언과 팁을 포함하세요. 정확한 정보와 전문 용어를 적절히 사용하고, 독자에게 실질적인 가치를 제공하는 콘텐츠를 HTML 형식으로 작성해주세요. 반드시 주제와 관련된 독창적인 제목을 <h1> 태그로 포함시켜주세요.`,
       
       // 경험 공유 스타일
-      `당신은 ${keyword}에 대한 풍부한 경험을 가진 블로거입니다. 이 주제에 관한 개인적인 경험과 이야기를 중심으로 공감을 이끌어내는 블로그 글을 작성해주세요. 실제 사례, 느낀 점, 배운 교훈을 자연스럽게 풀어내는 친근한 톤으로 HTML 형식의 글을 작성해주세요.`,
+      `당신은 ${keyword}에 대한 풍부한 경험을 가진 블로거입니다. 이 주제에 관한 개인적인 경험과 이야기를 중심으로 공감을 이끌어내는 블로그 글을 작성해주세요. 실제 사례, 느낀 점, 배운 교훈을 자연스럽게 풀어내는 친근한 톤으로 HTML 형식의 글을 작성해주세요. 반드시 주제와 관련된 독창적인 제목을 <h1> 태그로 포함시켜주세요.`,
       
       // Q&A 중심 스타일
-      `당신은 ${keyword}에 관한 자주 묻는 질문들에 답변하는 형식의 블로그 글을 작성해주세요. 독자들이 가장 궁금해할 만한 5-7개의 질문을 선정하고, 각 질문에 명확하고 유용한 답변을 제공하세요. 질문과 답변 형식으로 구성된 HTML 형식의 콘텐츠를 작성해주세요.`
+      `당신은 ${keyword}에 관한 자주 묻는 질문들에 답변하는 형식의 블로그 글을 작성해주세요. 독자들이 가장 궁금해할 만한 5-7개의 질문을 선정하고, 각 질문에 명확하고 유용한 답변을 제공하세요. 질문과 답변 형식으로 구성된 HTML 형식의 콘텐츠를 작성해주세요. 반드시 주제와 관련된 독창적인 제목을 <h1> 태그로 포함시켜주세요.`
     ];
     
     // 프롬프트 스타일 선택 (postData에 promptStyle이 있으면 사용, 없으면 랜덤)
@@ -311,28 +311,47 @@ async function generateAIContent(keyword) {
       // promptStyle에 따라 프롬프트 선택
       if (postData.promptStyle === 'expert') {
         selectedPrompt = promptTemplates[0]; // 전문가 가이드
+        logger.info('전문가 가이드 스타일 프롬프트 선택');
       } else if (postData.promptStyle === 'experience') {
         selectedPrompt = promptTemplates[1]; // 경험 공유
+        logger.info('경험 공유 스타일 프롬프트 선택');
       } else if (postData.promptStyle === 'qa') {
         selectedPrompt = promptTemplates[2]; // Q&A 중심
+        logger.info('Q&A 중심 스타일 프롬프트 선택');
       } else {
         // 랜덤 (기본값)
-        selectedPrompt = promptTemplates[Math.floor(Math.random() * promptTemplates.length)];
+        const randomIndex = Math.floor(Math.random() * promptTemplates.length);
+        selectedPrompt = promptTemplates[randomIndex];
+        logger.info(`랜덤 프롬프트 선택 (인덱스: ${randomIndex})`);
       }
     } else {
       // promptStyle이 없으면 랜덤
-      selectedPrompt = promptTemplates[Math.floor(Math.random() * promptTemplates.length)];
+      const randomIndex = Math.floor(Math.random() * promptTemplates.length);
+      selectedPrompt = promptTemplates[randomIndex];
+      logger.info(`랜덤 프롬프트 선택 (인덱스: ${randomIndex})`);
     }
+    
+    // AI가 항상 다른 응답을 생성하도록 현재 시간과 랜덤 시드 추가
+    const timestamp = new Date().toISOString();
+    const randomSeed = Math.random().toString(36).substring(2, 15);
+    
+    const systemPrompt = `${selectedPrompt}\n\n참고: 이 요청은 ${timestamp}에 생성되었으며, 고유 식별자는 ${randomSeed}입니다. 이전에 작성한 컨텐츠와 완전히 다른 내용으로 창의적인 글을 작성해주세요.`;
+    
+    logger.info('OpenAI API 호출 세부 정보', { 
+      timestamp, 
+      randomSeed, 
+      promptFirstLine: selectedPrompt.split('\n')[0].substring(0, 50) + '...' 
+    });
     
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: selectedPrompt
+          content: systemPrompt
         }
       ],
-      temperature: 0.8, // 다양성을 위해 temperature 증가
+      temperature: 0.9, // 다양성을 더 높이기 위해 temperature 증가
       max_tokens: 1500
     }, {
       headers: {
@@ -425,7 +444,7 @@ async function createPostLogic(postData) {
     // AI 컨텐츠 생성 옵션인 경우
     if (postData.contentStrategy === 'ai_only') {
       logger.info('AI를 사용하여 컨텐츠 생성 중...', { keyword });
-      const aiContent = await generateAIContent(keyword);
+      const aiContent = await generateAIContent(keyword, postData);
       title = aiContent.title;
       content = aiContent.content;
     } 
@@ -476,20 +495,57 @@ async function createPostLogic(postData) {
                   contentType: file.mimetype
                 });
                 
-                // WordPress API 설정 로드
-                const wpUrl = process.env.WP_API_URL;
-                const wpUser = process.env.WP_USER;
-                const wpPassword = process.env.WP_PASSWORD;
+                // WordPress API 설정 로드 - platformData 우선 사용
+                let wpUrl, wpUser, wpPassword;
+                
+                // 플랫폼 데이터가 있으면 우선 사용
+                if (postData.platformData && postData.platformData.siteUrl && 
+                    postData.platformData.username && postData.platformData.password) {
+                  wpUrl = postData.platformData.siteUrl;
+                  wpUser = postData.platformData.username;
+                  wpPassword = postData.platformData.password;
+                  logger.info('플랫폼 데이터를 사용하여 이미지 업로드', { 
+                    platform: postData.platformData.name || 'WordPress',
+                    url: wpUrl 
+                  });
+                } else {
+                  // 환경 변수에서 정보 가져오기
+                  wpUrl = process.env.WP_API_URL;
+                  wpUser = process.env.WP_USER;
+                  wpPassword = process.env.WP_PASSWORD;
+                  logger.info('환경 변수에서 WordPress 인증 정보 가져오기', { wpUrl });
+                }
                 
                 if (!wpUrl || !wpUser || !wpPassword) {
-                  throw new Error('WordPress API 설정이 완료되지 않았습니다.');
+                  throw new Error('WordPress API 설정이 완료되지 않았습니다. 워드프레스 계정 설정을 확인하세요.');
                 }
+                
+                // URL 형식화 - 전체 URL 형식 체크 및 수정
+                // URL에서 http:// 또는 https:// 접두사가 없는 경우 추가
+                if (!wpUrl.startsWith('http://') && !wpUrl.startsWith('https://')) {
+                  wpUrl = 'https://' + wpUrl;
+                  logger.info('URL에 https:// 접두사 추가', { wpUrl });
+                }
+                
+                // 슬래시로 끝나는 경우 제거
+                wpUrl = wpUrl.replace(/\/$/, '');
+                
+                // URL이 /wp-json으로 끝나는 경우
+                if (wpUrl.endsWith('/wp-json')) {
+                  wpUrl = `${wpUrl}/wp/v2`;
+                }
+                // URL이 /wp-json/wp/v2로 끝나지 않으면 추가
+                else if (!wpUrl.includes('/wp-json/wp/v2') && !wpUrl.includes('/wp-json/wp/v2/')) {
+                  wpUrl = `${wpUrl}/wp-json/wp/v2`;
+                }
+                
+                logger.info('이미지 업로드에 사용할 WordPress API URL', { mediaApiUrl: `${wpUrl}/media` });
                 
                 // WordPress 인증을 위한 토큰 생성
                 const authString = Buffer.from(`${wpUser}:${wpPassword}`).toString('base64');
                 
                 // WordPress에 이미지 업로드
-                const uploadResponse = await axios.post(`${wpUrl}/wp-json/wp/v2/media`, form, {
+                const uploadResponse = await axios.post(`${wpUrl}/media`, form, {
                   headers: {
                     ...form.getHeaders(),
                     'Authorization': `Basic ${authString}`,
@@ -514,6 +570,20 @@ async function createPostLogic(postData) {
                 }
               } catch (wpError) {
                 logger.error('이미지 업로드 실패', { error: wpError.message });
+                
+                // 응답 데이터 확인을 위한 디버깅 정보 추가
+                if (wpError.response) {
+                  logger.error('WordPress 이미지 API 응답 오류', { 
+                    status: wpError.response.status,
+                    statusText: wpError.response.statusText,
+                    headers: wpError.response.headers
+                  });
+                  
+                  // HTML 응답인 경우 로그 추가
+                  if (typeof wpError.response.data === 'string' && wpError.response.data.includes('<!DOCTYPE')) {
+                    logger.error('WordPress API가 HTML을 반환했습니다. API URL이 올바른지 확인하세요.');
+                  }
+                }
               }
             } else {
               // 테스트 모드 - 이미지 URL 대신 placeholder 사용
