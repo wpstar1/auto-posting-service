@@ -43,15 +43,33 @@ async function searchUnsplashImages(keyword, count = 1) {
 }
 
 // WordPress에 이미지 업로드
-async function uploadImageToWordPress(imageUrl, title) {
+async function uploadImageToWordPress(imageUrl, title, platformData = null) {
   try {
-    // WordPress API 설정 로드
-    const wpUrl = process.env.WP_API_URL;
-    const wpUser = process.env.WP_USER;
-    const wpPassword = process.env.WP_PASSWORD;
+    let wpUrl, wpUser, wpPassword;
     
+    // platformData가 있으면 해당 데이터 사용, 없으면 환경 변수 사용
+    if (platformData && platformData.siteUrl && platformData.username && platformData.password) {
+      wpUrl = platformData.siteUrl;
+      wpUser = platformData.username;
+      wpPassword = platformData.password;
+      logger.info('플랫폼 데이터를 사용하여 WordPress 인증 정보 설정');
+    } else {
+      // 환경 변수에서 정보 가져오기
+      wpUrl = process.env.WP_API_URL;
+      wpUser = process.env.WP_USER;
+      wpPassword = process.env.WP_PASSWORD;
+      logger.info('환경 변수에서 WordPress 인증 정보 가져오기');
+    }
+    
+    // 필요한 정보가 있는지 확인
     if (!wpUrl || !wpUser || !wpPassword) {
-      throw new Error('WordPress API 설정이 완료되지 않았습니다.');
+      throw new Error('WordPress API 설정이 완료되지 않았습니다. 워드프레스 계정 설정을 확인하세요.');
+    }
+    
+    // URL이 /wp-json/wp/v2로 끝나지 않으면 추가
+    if (!wpUrl.endsWith('/wp-json/wp/v2') && !wpUrl.endsWith('/wp-json/wp/v2/')) {
+      wpUrl = wpUrl.replace(/\/$/, ''); // 끝에 슬래시가 있으면 제거
+      wpUrl = `${wpUrl}/wp-json/wp/v2`;
     }
     
     // 이미지 다운로드
@@ -96,7 +114,7 @@ async function uploadImageToWordPress(imageUrl, title) {
     // WordPress에 이미지 업로드
     logger.info('WordPress에 이미지 업로드 중...', { filename });
     
-    const uploadResponse = await axios.post(`${wpUrl}/wp-json/wp/v2/media`, form, {
+    const uploadResponse = await axios.post(`${wpUrl}/media`, form, {
       headers: {
         ...form.getHeaders(),
         'Authorization': `Basic ${authString}`,
@@ -131,15 +149,33 @@ async function uploadImageToWordPress(imageUrl, title) {
 }
 
 // 워드프레스에 포스팅하는 함수
-async function postToWordPress(title, content, featuredImageId = null) {
+async function postToWordPress(title, content, featuredImageId = null, platformData = null) {
   try {
-    // .env 파일에서 WordPress API 설정 로드
-    const wpUrl = process.env.WP_API_URL;
-    const wpUser = process.env.WP_USER;
-    const wpPassword = process.env.WP_PASSWORD;
+    let wpUrl, wpUser, wpPassword;
     
+    // platformData가 있으면 해당 데이터 사용, 없으면 환경 변수 사용
+    if (platformData && platformData.siteUrl && platformData.username && platformData.password) {
+      wpUrl = platformData.siteUrl;
+      wpUser = platformData.username;
+      wpPassword = platformData.password;
+      logger.info('플랫폼 데이터를 사용하여 WordPress 인증 정보 설정');
+    } else {
+      // 환경 변수에서 정보 가져오기
+      wpUrl = process.env.WP_API_URL;
+      wpUser = process.env.WP_USER;
+      wpPassword = process.env.WP_PASSWORD;
+      logger.info('환경 변수에서 WordPress 인증 정보 가져오기');
+    }
+    
+    // 필요한 정보가 있는지 확인
     if (!wpUrl || !wpUser || !wpPassword) {
-      throw new Error('WordPress API 설정이 완료되지 않았습니다. .env 파일을 확인하세요.');
+      throw new Error('WordPress API 설정이 완료되지 않았습니다. 워드프레스 계정 설정을 확인하세요.');
+    }
+    
+    // URL이 /wp-json/wp/v2로 끝나지 않으면 추가
+    if (!wpUrl.endsWith('/wp-json/wp/v2') && !wpUrl.endsWith('/wp-json/wp/v2/')) {
+      wpUrl = wpUrl.replace(/\/$/, ''); // 끝에 슬래시가 있으면 제거
+      wpUrl = `${wpUrl}/wp-json/wp/v2`;
     }
     
     // WordPress 인증을 위한 토큰 생성
@@ -500,7 +536,7 @@ async function createPostLogic(postData) {
     if (postData.targetPlatform === 'wordpress') {
       try {
         // 이미지 ID 없이 포스팅 (이미지는 이미 콘텐츠에 포함됨)
-        postResult = await postToWordPress(title, content, null);
+        postResult = await postToWordPress(title, content, null, postData.platformData);
         logger.info('워드프레스 포스팅 완료', { result: postResult });
       } catch (wpError) {
         logger.error('워드프레스 포스팅 실패', { error: wpError.message });

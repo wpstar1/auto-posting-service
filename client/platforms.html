@@ -131,14 +131,31 @@
                                 <input type="text" id="username" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">Application Password</label>
+                                <label class="block text-sm font-medium text-gray-700">워드프레스 비밀번호</label>
                                 <input type="password" id="appPassword" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <p class="mt-1 text-xs text-gray-500">※ 워드프레스 관리자 > 프로필 > 애플리케이션 비밀번호에서 생성</p>
+                                <p class="mt-1 text-xs text-gray-500">※ 워드프레스 관리자 계정의 비밀번호를 입력하세요</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700">API 키 (REST API)</label>
+                                <div class="flex items-center">
+                                    <label class="block text-sm font-medium text-gray-700">API 키 (REST API)</label>
+                                    <div class="relative ml-2 group">
+                                        <svg class="h-5 w-5 text-gray-400 cursor-help" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div class="absolute hidden group-hover:block z-10 w-64 p-3 bg-white border border-gray-200 rounded shadow-lg text-xs text-gray-600 top-0 left-full ml-2">
+                                            <h4 class="font-bold mb-1">워드프레스 API 키 발급 방법</h4>
+                                            <ol class="list-decimal pl-4 space-y-1">
+                                                <li>워드프레스 관리자 페이지에 로그인합니다.</li>
+                                                <li>좌측 메뉴에서 [사용자] → [프로필]로 이동합니다.</li>
+                                                <li>페이지 하단의 [애플리케이션 비밀번호] 섹션을 찾습니다.</li>
+                                                <li>이름에 "Auto Posting"을 입력하고 [추가] 버튼을 클릭합니다.</li>
+                                                <li>생성된 비밀번호를 복사하여 이곳에 붙여넣습니다.</li>
+                                            </ol>
+                                        </div>
+                                    </div>
+                                </div>
                                 <input type="text" id="appKey" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                                <p class="mt-1 text-xs text-gray-500">※ 워드프레스 REST API 키. 없으면 "key123"과 같이 임의 값 입력 가능</p>
+                                <p class="mt-1 text-xs text-gray-500">※ 워드프레스 애플리케이션 비밀번호를 입력하세요</p>
                             </div>
                         </div>
                         <div class="mt-6 flex justify-end space-x-3">
