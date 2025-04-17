@@ -83,20 +83,20 @@ async function uploadImageToWordPress(imageUrl, title) {
       contentType = 'image/gif';
     }
     
-    // WordPress에 이미지 업로드 (form-data 형식으로)
-    logger.info('WordPress에 이미지 업로드 중...', { filename });
-    
-    // 이미지 파일을 임시로 저장
-    const tempFilePath = path.join(__dirname, '..', 'uploads', filename);
-    await fs.writeFile(tempFilePath, buffer);
-    
-    // 파일 스트림으로 전송하기 위한 FormData 생성
+    // FormData 생성 및 파일 첨부
     const FormData = require('form-data');
     const form = new FormData();
-    const fileStream = fs.createReadStream(tempFilePath);
-    form.append('file', fileStream);
     
-    const uploadResponse = await axios.post(`${wpUrl}/media`, form, {
+    // 기존 createReadStream 대신 버퍼 직접 추가
+    form.append('file', buffer, {
+      filename: filename,
+      contentType: contentType
+    });
+    
+    // WordPress에 이미지 업로드
+    logger.info('WordPress에 이미지 업로드 중...', { filename });
+    
+    const uploadResponse = await axios.post(`${wpUrl}/wp-json/wp/v2/media`, form, {
       headers: {
         ...form.getHeaders(),
         'Authorization': `Basic ${authString}`,
@@ -106,7 +106,7 @@ async function uploadImageToWordPress(imageUrl, title) {
     
     // 임시 파일 삭제
     try {
-      await fs.unlink(tempFilePath);
+      // await fs.unlink(tempFilePath);
     } catch (unlinkError) {
       logger.warn('임시 이미지 파일 삭제 실패', { error: unlinkError.message });
     }
@@ -193,24 +193,51 @@ async function generateAIContent(keyword) {
     
     logger.info('OpenAI API 호출 중...', { keyword });
     
+    // 다양한 프롬프트 템플릿 중 랜덤하게 선택
+    const promptTemplates = [
+      // 전문가 가이드 스타일
+      `당신은 ${keyword} 분야의 전문가입니다. 이 주제에 대한 전문적인 가이드 스타일의 블로그 글을 작성해주세요. 중요한 개념을 설명하고, 실용적인 조언과 팁을 포함하세요. 정확한 정보와 전문 용어를 적절히 사용하고, 독자에게 실질적인 가치를 제공하는 콘텐츠를 HTML 형식으로 작성해주세요.`,
+      
+      // 경험 공유 스타일
+      `당신은 ${keyword}에 대한 풍부한 경험을 가진 블로거입니다. 이 주제에 관한 개인적인 경험과 이야기를 중심으로 공감을 이끌어내는 블로그 글을 작성해주세요. 실제 사례, 느낀 점, 배운 교훈을 자연스럽게 풀어내는 친근한 톤으로 HTML 형식의 글을 작성해주세요.`,
+      
+      // Q&A 중심 스타일
+      `당신은 ${keyword}에 관한 자주 묻는 질문들에 답변하는 형식의 블로그 글을 작성해주세요. 독자들이 가장 궁금해할 만한 5-7개의 질문을 선정하고, 각 질문에 명확하고 유용한 답변을 제공하세요. 질문과 답변 형식으로 구성된 HTML 형식의 콘텐츠를 작성해주세요.`
+    ];
+    
+    // 프롬프트 스타일 선택 (postData에 promptStyle이 있으면 사용, 없으면 랜덤)
+    let selectedPrompt;
+    if (postData && postData.promptStyle) {
+      // promptStyle에 따라 프롬프트 선택
+      if (postData.promptStyle === 'expert') {
+        selectedPrompt = promptTemplates[0]; // 전문가 가이드
+      } else if (postData.promptStyle === 'experience') {
+        selectedPrompt = promptTemplates[1]; // 경험 공유
+      } else if (postData.promptStyle === 'qa') {
+        selectedPrompt = promptTemplates[2]; // Q&A 중심
+      } else {
+        // 랜덤 (기본값)
+        selectedPrompt = promptTemplates[Math.floor(Math.random() * promptTemplates.length)];
+      }
+    } else {
+      // promptStyle이 없으면 랜덤
+      selectedPrompt = promptTemplates[Math.floor(Math.random() * promptTemplates.length)];
+    }
+    
     const response = await axios.post('https://api.openai.com/v1/chat/completions', {
       model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
-          content: "당신은 블로그 포스팅 전문가입니다. 주어진 키워드에 대한 SEO에 최적화된 고품질 블로그 포스트를 작성해주세요. HTML 형식으로 응답해주세요."
-        },
-        {
-          role: "user",
-          content: `다음 키워드에 대한 블로그 포스트를 작성해주세요: "${keyword}". 제목과 내용을 모두 포함해주세요. 내용은 최소 300단어 이상으로 작성해주세요.`
+          content: selectedPrompt
         }
       ],
-      temperature: 0.7,
+      temperature: 0.8, // 다양성을 위해 temperature 증가
       max_tokens: 1500
     }, {
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openaiApiKey}`
+        'Authorization': `Bearer ${openaiApiKey}`,
+        'Content-Type': 'application/json'
       }
     });
     
@@ -313,25 +340,28 @@ async function createPostLogic(postData) {
       content = `<p>이것은 ${keyword}에 관한 기본 포스트입니다.</p>`;
     }
     
-    // 이미지 처리 - 사용자 업로드 이미지 우선, 없으면 AI 이미지 사용
+    // 이미지 처리 - 사용자 레벨에 따라 제한
     let imageAdded = false;
+    const imageHTMLs = []; // 이미지 HTML을 모아둘 배열
+    
+    // 사용자 레벨에 따른 이미지 최대 개수 설정
+    const MAX_IMAGES_LEVEL1 = 1;
+    const MAX_IMAGES_VIP = 5;
+    const maxAllowedImages = (postData.userLevel === 'vip') ? MAX_IMAGES_VIP : MAX_IMAGES_LEVEL1;
     
     // 1. 사용자가 업로드한 이미지 처리
     if (postData.uploadedFiles && postData.uploadedFiles.length > 0) {
       logger.info('사용자 업로드 이미지 처리 중...', { count: postData.uploadedFiles.length });
       try {
-        // 이미지 처리를 위한 빈 배열 생성
-        const imageHTMLs = [];
+        // 업로드 파일 제한
+        const filesToProcess = postData.uploadedFiles.slice(0, maxAllowedImages);
+        logger.info(`사용자 레벨(${postData.userLevel}): 이미지 ${filesToProcess.length}개 처리 중 (최대 ${maxAllowedImages}개)`);
         
         // 각 업로드된 파일에 대해 처리
-        for (const file of postData.uploadedFiles) {
+        for (const file of filesToProcess) {
           // 이미지 파일인지 확인
           if (file.mimetype && file.mimetype.startsWith('image/')) {
             logger.info('이미지 파일 처리', { filename: file.originalname });
-            
-            // WordPress 업로드를 위한 임시 파일 저장
-            const tempFilePath = path.join(__dirname, '..', 'uploads', file.originalname);
-            await fs.writeFile(tempFilePath, file.buffer);
             
             // 이미지 업로드 (WordPress인 경우)
             if (postData.targetPlatform === 'wordpress') {
@@ -339,8 +369,12 @@ async function createPostLogic(postData) {
                 // FormData 생성
                 const FormData = require('form-data');
                 const form = new FormData();
-                const fileStream = fs.createReadStream(tempFilePath);
-                form.append('file', fileStream);
+                
+                // 버퍼 직접 추가
+                form.append('file', file.buffer, {
+                  filename: file.originalname,
+                  contentType: file.mimetype
+                });
                 
                 // WordPress API 설정 로드
                 const wpUrl = process.env.WP_API_URL;
@@ -355,20 +389,13 @@ async function createPostLogic(postData) {
                 const authString = Buffer.from(`${wpUser}:${wpPassword}`).toString('base64');
                 
                 // WordPress에 이미지 업로드
-                const uploadResponse = await axios.post(`${wpUrl}/media`, form, {
+                const uploadResponse = await axios.post(`${wpUrl}/wp-json/wp/v2/media`, form, {
                   headers: {
                     ...form.getHeaders(),
                     'Authorization': `Basic ${authString}`,
                     'Content-Disposition': `attachment; filename=${file.originalname}`
                   }
                 });
-                
-                // 임시 파일 삭제
-                try {
-                  await fs.unlink(tempFilePath);
-                } catch (unlinkError) {
-                  logger.warn('임시 이미지 파일 삭제 실패', { error: unlinkError.message });
-                }
                 
                 if (uploadResponse.status === 201) {
                   logger.info('사용자 이미지 업로드 성공', { 
@@ -401,63 +428,70 @@ async function createPostLogic(postData) {
           }
         }
         
-        // 모든 이미지 HTML 포스트 내용에 추가
         if (imageHTMLs.length > 0) {
-          // 콘텐츠 시작 부분에 이미지 삽입 (제목 태그 뒤에 오도록)
-          const titleTagRegex = /<h[1-6][^>]*>.*?<\/h[1-6]>/i;
-          const hasTitle = titleTagRegex.test(content);
-          
-          if (hasTitle) {
-            content = content.replace(titleTagRegex, match => match + imageHTMLs.join(''));
-          } else {
-            content = imageHTMLs.join('') + content;
-          }
-          
           imageAdded = true;
-          logger.info('사용자 업로드 이미지를 콘텐츠에 삽입했습니다', { count: imageHTMLs.length });
+          logger.info('사용자 업로드 이미지 처리 완료', { count: imageHTMLs.length });
         }
       } catch (imageError) {
         logger.error('사용자 업로드 이미지 처리 중 오류 발생', { error: imageError.message });
       }
     }
     
-    // 2. 사용자 업로드 이미지가 없고 AI 이미지 옵션이 활성화된 경우 Unsplash 이미지 사용
-    if (!imageAdded && postData.imageStrategy === 'ai') {
+    // 2. 사용자가 AI 이미지 옵션을 활성화했고, 최대 이미지 개수에 도달하지 않은 경우 Unsplash 이미지 추가
+    const maxImages = 5; // 최대 이미지 개수
+    if (postData.imageStrategy === 'ai' && imageHTMLs.length < maxAllowedImages) {
       logger.info('Unsplash API를 사용하여 이미지 검색 중...', { keyword });
       try {
+        // 추가로 필요한 이미지 개수 계산
+        const additionalImagesNeeded = maxAllowedImages - imageHTMLs.length;
+        const imagesToFetch = Math.min(additionalImagesNeeded, 2); // 최대 2개의 AI 이미지만 추가
+        
         // Unsplash에서 이미지 검색
-        const images = await searchUnsplashImages(keyword, 1);
+        const images = await searchUnsplashImages(keyword, imagesToFetch);
         
         if (images && images.length > 0) {
-          const image = images[0];
-          logger.info('이미지 검색 성공', { imageUrl: image.url });
-          
-          // 이미지를 포스트 내용에 직접 삽입
-          const imageHtml = `
-            <figure class="wp-block-image">
-              <img src="${image.url}" alt="${image.description || keyword}"/>
-              <figcaption>이미지 제공: <a href="${image.authorUrl}" target="_blank">${image.authorName}</a> on Unsplash</figcaption>
-            </figure>
-          `;
-          
-          // 콘텐츠 시작 부분에 이미지 삽입 (제목 태그 뒤에 오도록)
-          const titleTagRegex = /<h[1-6][^>]*>.*?<\/h[1-6]>/i;
-          const hasTitle = titleTagRegex.test(content);
-          
-          if (hasTitle) {
-            content = content.replace(titleTagRegex, match => match + imageHtml);
-          } else {
-            content = imageHtml + content;
+          for (const image of images) {
+            logger.info('이미지 검색 성공', { imageUrl: image.url });
+            
+            // 이미지 HTML 생성
+            const imageHtml = `
+              <figure class="wp-block-image">
+                <img src="${image.url}" alt="${image.description || keyword}"/>
+                <figcaption>이미지 제공: <a href="${image.authorUrl}" target="_blank">${image.authorName}</a> on Unsplash</figcaption>
+              </figure>
+            `;
+            
+            imageHTMLs.push(imageHtml);
+            imageAdded = true;
           }
-          
-          imageAdded = true;
-          logger.info('Unsplash 이미지를 콘텐츠에 삽입했습니다');
+          logger.info('Unsplash 이미지 추가 완료', { count: images.length });
         } else {
-          logger.warn('이미지를 찾을 수 없습니다. 이미지 없이 계속합니다');
+          logger.warn('AI 이미지를 찾을 수 없습니다.');
         }
       } catch (imageError) {
-        logger.error('이미지 처리 중 오류 발생, 이미지 없이 계속합니다', { error: imageError.message });
+        logger.error('AI 이미지 처리 중 오류 발생', { error: imageError.message });
       }
+    }
+    
+    // 3. 모든 이미지 HTML을 무작위로 섞고 콘텐츠에 삽입
+    if (imageHTMLs.length > 0) {
+      // Fisher-Yates 알고리즘으로 배열 섞기
+      for (let i = imageHTMLs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [imageHTMLs[i], imageHTMLs[j]] = [imageHTMLs[j], imageHTMLs[i]];
+      }
+      
+      // 콘텐츠 시작 부분에 이미지 삽입 (제목 태그 뒤에 오도록)
+      const titleTagRegex = /<h[1-6][^>]*>.*?<\/h[1-6]>/i;
+      const hasTitle = titleTagRegex.test(content);
+      
+      if (hasTitle) {
+        content = content.replace(titleTagRegex, match => match + imageHTMLs.join(''));
+      } else {
+        content = imageHTMLs.join('') + content;
+      }
+      
+      logger.info('이미지를 콘텐츠에 삽입했습니다', { count: imageHTMLs.length });
     }
     
     // 워드프레스에 포스팅 (타겟 플랫폼에 따라 분기 처리)

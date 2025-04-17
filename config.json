@@ -1,1 +1,18 @@
-{}
+{
+  "postingEnabled": true,
+  "postingInterval": 60,
+  "maxPostsPerDay": 24,
+  "keywordRotation": true,
+  "keywords": [
+    "블로그 운영",
+    "웹 디자인",
+    "프로그래밍",
+    "인공지능",
+    "디지털 마케팅",
+    "SNS 마케팅",
+    "콘텐츠 제작",
+    "자동 포스팅",
+    "SEO 최적화",
+    "웹사이트 트래픽"
+  ]
+}

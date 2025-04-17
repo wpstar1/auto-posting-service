@@ -86,7 +86,8 @@
 
                         <!-- 이미지 선택 -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700">이미지</label>
+                            <label class="block text-sm font-medium text-gray-700">이미지 설정</label>
+                            <p class="text-sm text-gray-500 mb-2">이미지는 최대 5개까지 업로드 가능합니다.</p>
                             <div class="mt-1 flex items-center space-x-4">
                                 <button type="button" onclick="openImageSelector()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                                     이미지 선택
@@ -133,7 +134,93 @@
         if (!token) {
             window.location.href = '/login.html';
         }
-
+        
+        // 전역 변수로 사용자 레벨 저장
+        let userLevel = 1; // 기본값
+        
+        // 이미지 관련 변수
+        let selectedImages = [];
+        const MAX_IMAGES_LEVEL1 = 1;
+        const MAX_IMAGES_VIP = 5;
+        
+        // 이미지 선택기 열기
+        function openImageSelector() {
+            // 레벨 1 사용자에게 VIP 알림
+            if (userLevel !== 'vip') {
+                alert('VIP 회원 전용입니다. 이미지는 1개만 추가 가능합니다.');
+            }
+            
+            // 파일 선택기 생성 및 열기
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.multiple = true;
+            
+            fileInput.addEventListener('change', function(e) {
+                handleSelectedFiles(e.target.files);
+            });
+            
+            fileInput.click();
+        }
+        
+        // 선택된 파일 처리
+        function handleSelectedFiles(files) {
+            if (!files || files.length === 0) return;
+            
+            // 레벨에 따른 이미지 개수 제한
+            const maxImages = userLevel === 'vip' ? MAX_IMAGES_VIP : MAX_IMAGES_LEVEL1;
+            
+            // 이미 선택된 이미지가 최대 개수를 초과하는지 확인
+            if (selectedImages.length >= maxImages) {
+                alert(`이미지는 최대 ${maxImages}개까지만 업로드 가능합니다.`);
+                return;
+            }
+            
+            // 추가로 선택 가능한 이미지 개수 계산
+            const remainingSlots = maxImages - selectedImages.length;
+            const filesToAdd = Math.min(files.length, remainingSlots);
+            
+            // 레벨 1 사용자가 추가 이미지를 선택했을 경우 알림
+            if (userLevel !== 'vip' && files.length > remainingSlots) {
+                alert(`VIP 회원 전용입니다. 레벨 1 회원은 이미지를 ${MAX_IMAGES_LEVEL1}개만 추가할 수 있습니다.`);
+            }
+            
+            // 허용된 개수만큼만 이미지 추가
+            for (let i = 0; i < filesToAdd; i++) {
+                const file = files[i];
+                selectedImages.push(file);
+                
+                // 미리보기 생성
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const imgContainer = document.createElement('div');
+                    imgContainer.className = 'relative';
+                    
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.className = 'h-16 w-16 object-cover rounded-md';
+                    img.alt = file.name;
+                    
+                    const removeBtn = document.createElement('button');
+                    removeBtn.className = 'absolute top-0 right-0 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center';
+                    removeBtn.innerHTML = 'x';
+                    removeBtn.onclick = function() {
+                        // 이미지 및 컨테이너 제거
+                        const index = selectedImages.indexOf(file);
+                        if (index > -1) {
+                            selectedImages.splice(index, 1);
+                        }
+                        imgContainer.remove();
+                    };
+                    
+                    imgContainer.appendChild(img);
+                    imgContainer.appendChild(removeBtn);
+                    document.getElementById('selectedImages').appendChild(imgContainer);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
         // TinyMCE 초기화
         tinymce.init({
             selector: '#content',
@@ -185,6 +272,7 @@
                         document.getElementById('scheduleSection').classList.remove('hidden');
                         document.getElementById('scheduleDate').disabled = false;
                         document.getElementById('scheduleTime').disabled = false;
+                        userLevel = 'vip';
                     }
                 }
             } catch (error) {
@@ -218,6 +306,11 @@
                     const scheduledAt = new Date(`${scheduleDate.value}T${scheduleTime.value}`);
                     formData.append('scheduledAt', scheduledAt.toISOString());
                 }
+                
+                // 이미지 추가
+                selectedImages.forEach((image, index) => {
+                    formData.append(`images[${index}]`, image);
+                });
                 
                 const response = await fetch('/api/post', {
                     method: 'POST',
